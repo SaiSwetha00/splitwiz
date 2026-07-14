@@ -1,0 +1,65 @@
+// Prisma schema for the expense splitter.
+// Amounts are stored as integer minor units (e.g. cents) to avoid float rounding.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Trip {
+  id        String    @id @default(cuid())
+  code      String    @unique // shareable code used in the URL
+  name      String
+  currency  String    @default("USD")
+  createdAt DateTime  @default(now())
+
+  members  Member[]
+  expenses Expense[]
+}
+
+model Member {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  tripId String
+  trip   Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  paidExpenses Expense[]      @relation("PaidBy")
+  shares       ExpenseShare[]
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  description String
+  amount      Int // total amount in minor units (cents)
+  category    String?
+  splitType   String   @default("EQUAL") // "EQUAL" | "CUSTOM"
+  createdAt   DateTime @default(now())
+
+  tripId String
+  trip   Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  paidById String
+  paidBy   Member @relation("PaidBy", fields: [paidById], references: [id])
+
+  shares ExpenseShare[]
+}
+
+// One row per participant in an expense: how much of it that member owes.
+model ExpenseShare {
+  id       String @id @default(cuid())
+  amount   Int // minor units this member owes for the expense
+
+  expenseId String
+  expense   Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id])
+
+  @@unique([expenseId, memberId])
+}
