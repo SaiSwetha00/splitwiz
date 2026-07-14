@@ -2,7 +2,8 @@
 // Amounts are stored as integer minor units (e.g. cents) to avoid float rounding.
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
