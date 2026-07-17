@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
+import { createAdminClient } from "@/lib/supabase/server";
 
 export type TripRole = "owner" | "editor" | "viewer";
 
@@ -37,7 +38,7 @@ export async function checkTripWrite(
     return { ok: true, userId: user.id, role: "owner" };
   }
 
-  const { data: collab } = await supabase
+  const { data: collab } = await createAdminClient()
     .from("trip_collaborators")
     .select("role")
     .eq("trip_id", tripId)
@@ -77,7 +78,7 @@ export async function resolveUserRole(
   if (!user) return null;
   if (tripUserId === user.id) return "owner";
 
-  const { data: collab } = await supabase
+  const { data: collab } = await createAdminClient()
     .from("trip_collaborators")
     .select("role")
     .eq("trip_id", tripId)

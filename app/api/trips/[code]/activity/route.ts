@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 
 type RouteParams = { params: Promise<{ code: string }> };
 
@@ -10,7 +9,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
   const supabase = await createClient();
   const admin = createAdminClient();
 
-  const { data: trip } = await supabase
+  const { data: trip } = await admin
     .from("trips")
     .select("id, user_id")
     .eq("code", code.toUpperCase())
@@ -32,7 +31,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
       );
     }
     if (trip.user_id !== user.id) {
-      const { data: collab } = await supabase
+      const { data: collab } = await admin
         .from("trip_collaborators")
         .select("role")
         .eq("trip_id", trip.id)

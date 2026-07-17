@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { checkTripWrite } from "@/lib/auth/tripAccess";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
@@ -21,7 +20,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
   const supabase = await createClient();
   const admin = createAdminClient();
 
-  const { data: trip } = await supabase
+  const { data: trip } = await admin
     .from("trips")
     .select("id, user_id")
     .eq("code", code.toUpperCase())
@@ -41,7 +40,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
     }
     const isCreator = trip.user_id === user.id;
     if (!isCreator) {
-      const { data: collab } = await supabase
+      const { data: collab } = await admin
         .from("trip_collaborators")
         .select("role")
         .eq("trip_id", trip.id)
@@ -101,7 +100,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     );
   }
 
-  const { data: trip } = await supabase
+  const { data: trip } = await admin
     .from("trips")
     .select("id, user_id")
     .eq("code", code.toUpperCase())
@@ -117,7 +116,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   }
 
   // Verify expense belongs to this trip.
-  const { data: expense } = await supabase
+  const { data: expense } = await admin
     .from("expenses")
     .select("id")
     .eq("id", expenseId)

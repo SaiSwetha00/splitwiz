@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { checkTripWrite } from "@/lib/auth/tripAccess";
 
 type RouteParams = {
@@ -20,7 +19,7 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
     return NextResponse.json({ error: "Authentication required" }, { status: 401 });
   }
 
-  const { data: trip } = await supabase
+  const { data: trip } = await admin
     .from("trips")
     .select("id, user_id")
     .eq("code", code.toUpperCase())
@@ -56,9 +55,16 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
     }
   }
 
-  // Delete from storage then from DB.
+  const { error: dbDeleteError } = await admin
+    .from("receipts")
+    .delete()
+    .eq("id", receiptId);
+
+  if (dbDeleteError) {
+    return NextResponse.json({ error: "Failed to delete receipt" }, { status: 500 });
+  }
+
   await admin.storage.from("receipts").remove([receipt.storage_path]);
-  await admin.from("receipts").delete().eq("id", receiptId);
 
   return NextResponse.json({ ok: true });
 }

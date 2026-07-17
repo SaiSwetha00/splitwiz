@@ -60,10 +60,7 @@ export async function POST(request: NextRequest) {
 
   if (tripError || !trip) {
     console.error("Trip insert error:", tripError);
-    return NextResponse.json(
-      { error: "Failed to create trip", detail: tripError?.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create trip" }, { status: 500 });
   }
 
   const { error: membersError } = await admin

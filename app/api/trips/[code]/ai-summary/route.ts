@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { fromCents } from "@/lib/money";
 
 type RouteParams = { params: Promise<{ code: string }> };
@@ -16,8 +16,9 @@ export async function POST(_request: Request, { params }: RouteParams) {
   }
 
   const supabase = await createClient();
+  const admin = createAdminClient();
 
-  const { data: trip } = await supabase
+  const { data: trip } = await admin
     .from("trips")
     .select("id, name, currency, user_id")
     .eq("code", code.toUpperCase())
@@ -38,7 +39,7 @@ export async function POST(_request: Request, { params }: RouteParams) {
       );
     }
     if (trip.user_id !== user.id) {
-      const { data: collab } = await supabase
+      const { data: collab } = await admin
         .from("trip_collaborators")
         .select("role")
         .eq("trip_id", trip.id)
@@ -51,13 +52,13 @@ export async function POST(_request: Request, { params }: RouteParams) {
   }
 
   const [expensesResult, membersResult] = await Promise.all([
-    supabase
+    admin
       .from("expenses")
       .select("description, amount_cents, category, paid_by_id")
       .eq("trip_id", trip.id)
       .order("created_at", { ascending: true })
       .limit(30),
-    supabase.from("members").select("id, name").eq("trip_id", trip.id),
+    admin.from("members").select("id, name").eq("trip_id", trip.id),
   ]);
 
   const expenses = expensesResult.data ?? [];
