@@ -24,10 +24,9 @@ interface TopBarProps {
   displayName: string;
   email: string;
   theme: string;
-  onHamburger: () => void;
 }
 
-export function TopBar({ displayName, email, theme, onHamburger }: TopBarProps) {
+export function TopBar({ displayName, email, theme }: TopBarProps) {
   const pathname = usePathname();
   const title = getTitle(pathname);
 
@@ -39,7 +38,7 @@ export function TopBar({ displayName, email, theme, onHamburger }: TopBarProps) 
       {/* Left: hamburger + page title */}
       <div className="flex items-center gap-3 min-w-0">
         <button
-          onClick={onHamburger}
+          onClick={() => window.dispatchEvent(new CustomEvent("sidebar:toggle"))}
           aria-label="Toggle sidebar"
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border text-muted transition-colors hover:bg-border hover:text-foreground md:hidden"
         >

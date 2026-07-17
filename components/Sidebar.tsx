@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Avatar } from "@/components/Avatar";
 
 interface NavItem {
@@ -142,8 +142,6 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
 
 interface SidebarProps {
   displayName: string;
-  mobileOpen: boolean;
-  onMobileClose: () => void;
 }
 
 function SidebarContent({ displayName, onClose }: { displayName: string; onClose?: () => void }) {
@@ -326,13 +324,19 @@ function SidebarContent({ displayName, onClose }: { displayName: string; onClose
   );
 }
 
-export function Sidebar({ displayName, mobileOpen, onMobileClose }: SidebarProps) {
+export function Sidebar({ displayName }: SidebarProps) {
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    onMobileClose();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    setMobileOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    function onToggle() { setMobileOpen((v) => !v); }
+    window.addEventListener("sidebar:toggle", onToggle);
+    return () => window.removeEventListener("sidebar:toggle", onToggle);
+  }, []);
 
   return (
     <>
@@ -345,7 +349,7 @@ export function Sidebar({ displayName, mobileOpen, onMobileClose }: SidebarProps
       {mobileOpen && (
         <>
           <div
-            onClick={onMobileClose}
+            onClick={() => setMobileOpen(false)}
             style={{
               position: "fixed",
               inset: 0,
@@ -363,7 +367,7 @@ export function Sidebar({ displayName, mobileOpen, onMobileClose }: SidebarProps
               display: "flex",
             }}
           >
-            <SidebarContent displayName={displayName} onClose={onMobileClose} />
+            <SidebarContent displayName={displayName} onClose={() => setMobileOpen(false)} />
           </aside>
         </>
       )}
