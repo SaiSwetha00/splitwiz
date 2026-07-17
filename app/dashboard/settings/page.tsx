@@ -87,7 +87,7 @@ export default function SettingsPage() {
     return (
       <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6">
         <p className="text-sm text-muted">Loading...</p>
-      </main>
+      </div>
     );
   }
 

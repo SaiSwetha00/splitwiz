@@ -47,7 +47,7 @@ export default function AnalyticsPage() {
     return (
       <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
         <p className="text-muted">Loading analytics…</p>
-      </main>
+      </div>
     );
   }
 
@@ -55,7 +55,7 @@ export default function AnalyticsPage() {
     return (
       <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
         <p className="text-negative">{error}</p>
-      </main>
+      </div>
     );
   }
 
