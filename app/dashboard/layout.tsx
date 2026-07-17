@@ -26,13 +26,19 @@ export default async function DashboardLayout({
     user.email?.split("@")[0] ??
     "Account";
 
+  // Wrap in a server-rendered div so the async layout's Suspense boundary (B:0)
+  // contains real server HTML — this ensures React streams $RC to reveal it.
+  // If DashboardShell (a client component) were the direct root, React would mark
+  // the boundary $~ and never send the reveal script, leaving the page blank.
   return (
-    <DashboardShell
-      displayName={displayName}
-      email={user.email ?? ""}
-      theme={theme}
-    >
-      {children}
-    </DashboardShell>
+    <div className="flex flex-1 overflow-hidden" style={{ minHeight: 0 }}>
+      <DashboardShell
+        displayName={displayName}
+        email={user.email ?? ""}
+        theme={theme}
+      >
+        {children}
+      </DashboardShell>
+    </div>
   );
 }
