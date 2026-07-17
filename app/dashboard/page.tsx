@@ -18,6 +18,9 @@ export default async function DashboardPage() {
   const displayName: string =
     user.user_metadata?.display_name ?? user.email?.split("@")[0] ?? "there";
 
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+
   const [tripsResult, budgetsResult, goalsResult, subsResult] = await Promise.all([
     supabase
       .from("trips")
@@ -60,15 +63,18 @@ export default async function DashboardPage() {
     totalTarget > 0 ? Math.round((totalSaved / totalTarget) * 100) : null;
 
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-10">
-      <div className="mb-8 flex items-end justify-between">
+    <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
+      {/* Header */}
+      <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Hi, {displayName} 👋</h1>
-          <p className="mt-1 text-sm text-muted">Your financial overview</p>
+          <h2 className="text-xl font-bold tracking-tight">
+            {greeting}, {displayName} 👋
+          </h2>
+          <p className="mt-1 text-sm text-muted">Here&apos;s what&apos;s happening with your trips.</p>
         </div>
         <Link
-          href="/"
-          className="rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground hover:opacity-90"
+          href="/dashboard/trips/new"
+          className="shrink-0 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90"
         >
           + New trip
         </Link>
@@ -80,24 +86,45 @@ export default async function DashboardPage() {
           href="/dashboard"
           label="Trips"
           value={String(trips.length)}
-          sub={trips.length === 1 ? "1 trip" : `${trips.length} trips`}
+          sub={trips.length === 0 ? "No trips yet" : trips.length === 1 ? "1 trip" : `${trips.length} trips`}
+          color="#6366f1"
+          icon={
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+          }
         />
         <StatCard
           href="/dashboard/budgets"
           label="Budgets"
           value={String(budgets.length)}
-          sub={budgets.length === 0 ? "None yet" : budgets.length === 1 ? "1 budget" : `${budgets.length} budgets`}
+          sub={budgets.length === 0 ? "None yet" : `${budgets.length} active`}
+          color="#8b5cf6"
+          icon={
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="1" y="4" width="22" height="16" rx="2" />
+              <line x1="1" y1="10" x2="23" y2="10" />
+            </svg>
+          }
         />
         <StatCard
           href="/dashboard/savings"
           label="Savings"
-          value={savingsPct !== null ? `${savingsPct}%` : goals.length > 0 ? "—" : "0"}
-          sub={goals.length === 0 ? "No goals" : `${goals.length} active goal${goals.length !== 1 ? "s" : ""}`}
+          value={savingsPct !== null ? `${savingsPct}%` : "—"}
+          sub={goals.length === 0 ? "No goals yet" : `${goals.length} goal${goals.length !== 1 ? "s" : ""}`}
+          color="#10b981"
+          icon={
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+              <polyline points="17 6 23 6 23 12" />
+            </svg>
+          }
         />
         <StatCard
           href="/dashboard/subscriptions"
           label="Monthly subs"
-          value={subs.length > 0 ? `$${fromCents(monthlySubCost).toFixed(0)}/mo` : "—"}
+          value={subs.length > 0 ? `$${fromCents(monthlySubCost).toFixed(0)}` : "—"}
           sub={
             nextBill?.next_billing_date
               ? `Next: ${new Date(nextBill.next_billing_date).toLocaleDateString(undefined, { month: "short", day: "numeric" })}`
@@ -105,17 +132,34 @@ export default async function DashboardPage() {
               ? "None active"
               : `${subs.length} active`
           }
+          color="#f59e0b"
+          icon={
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="1 4 1 10 7 10" />
+              <polyline points="23 20 23 14 17 14" />
+              <path d="M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15" />
+            </svg>
+          }
         />
       </div>
 
+      {/* Search */}
       <div className="mb-6">
         <GlobalSearch />
       </div>
 
-      <InsightsSection />
+      {/* AI Insights */}
+      <div className="mb-8">
+        <InsightsSection />
+      </div>
 
-      {/* Trips section */}
-      <h2 className="mb-4 mt-10 font-semibold">Your trips</h2>
+      {/* Trips */}
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="font-semibold">Your trips</h3>
+        {trips.length > 0 && (
+          <span className="text-xs text-muted">{trips.length} total</span>
+        )}
+      </div>
 
       {trips.length > 0 ? (
         <div className="grid gap-3 sm:grid-cols-2">
@@ -129,27 +173,24 @@ export default async function DashboardPage() {
               <Link
                 key={trip.id}
                 href={`/trip/${trip.code}`}
-                className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-5 transition hover:border-accent"
+                className="group flex flex-col gap-3 rounded-2xl border border-border bg-surface p-5 transition-all hover:border-accent hover:shadow-sm"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <span className="font-semibold leading-tight">{trip.name}</span>
+                  <span className="font-semibold leading-tight group-hover:text-accent transition-colors">
+                    {trip.name}
+                  </span>
                   <span className="shrink-0 rounded-md bg-background px-2 py-0.5 font-mono text-xs text-muted">
                     {trip.code}
                   </span>
                 </div>
-                <div className="flex items-center gap-4 text-xs text-muted">
-                  <span>
-                    {currencySymbol(trip.currency)} {trip.currency}
-                  </span>
-                  <span>
-                    {memberCount} {memberCount === 1 ? "person" : "people"}
-                  </span>
-                  <span>
-                    {expenseCount} {expenseCount === 1 ? "expense" : "expenses"}
-                  </span>
+                <div className="flex items-center gap-3 text-xs text-muted">
+                  <span>{memberCount} {memberCount === 1 ? "person" : "people"}</span>
+                  <span className="text-border">·</span>
+                  <span>{expenseCount} {expenseCount === 1 ? "expense" : "expenses"}</span>
+                  <span className="text-border">·</span>
+                  <span>{currencySymbol(trip.currency)} {trip.currency}</span>
                 </div>
                 <p className="text-xs text-muted">
-                  Created{" "}
                   {new Date(trip.created_at).toLocaleDateString(undefined, {
                     month: "short",
                     day: "numeric",
@@ -162,20 +203,27 @@ export default async function DashboardPage() {
         </div>
       ) : (
         <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border py-16 text-center">
-          <p className="text-3xl">✈️</p>
-          <p className="font-medium">No trips yet</p>
-          <p className="text-sm text-muted">
-            Create your first trip and start splitting expenses with friends.
-          </p>
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/10 text-accent">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+          </div>
+          <div>
+            <p className="font-semibold">No trips yet</p>
+            <p className="mt-1 text-sm text-muted">
+              Create your first trip and start splitting expenses with friends.
+            </p>
+          </div>
           <Link
-            href="/"
-            className="rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground hover:opacity-90"
+            href="/dashboard/trips/new"
+            className="rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90"
           >
             Create a trip
           </Link>
         </div>
       )}
-    </main>
+    </div>
   );
 }
 
@@ -184,20 +232,34 @@ function StatCard({
   label,
   value,
   sub,
+  icon,
+  color,
 }: {
   href: string;
   label: string;
   value: string;
   sub: string;
+  icon: React.ReactNode;
+  color: string;
 }) {
   return (
     <Link
       href={href}
-      className="flex flex-col gap-1 rounded-2xl border border-border bg-surface p-4 transition hover:border-accent"
+      className="group flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4 transition-all hover:border-accent hover:shadow-sm"
     >
-      <span className="text-xs text-muted">{label}</span>
-      <span className="text-2xl font-bold leading-tight">{value}</span>
-      <span className="text-xs text-muted">{sub}</span>
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-medium text-muted">{label}</span>
+        <span
+          className="flex h-7 w-7 items-center justify-center rounded-lg"
+          style={{ background: `${color}18`, color }}
+        >
+          {icon}
+        </span>
+      </div>
+      <div>
+        <span className="text-2xl font-bold leading-none tracking-tight">{value}</span>
+        <p className="mt-1 text-xs text-muted">{sub}</p>
+      </div>
     </Link>
   );
 }

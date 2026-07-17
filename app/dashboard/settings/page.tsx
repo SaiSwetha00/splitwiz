@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import { SUPPORTED_CURRENCIES } from "@/lib/money";
 
@@ -85,14 +85,14 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10">
+      <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6">
         <p className="text-sm text-muted">Loading...</p>
       </main>
     );
   }
 
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10">
+    <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6">
       <div className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
         <p className="mt-0.5 text-sm text-muted">Manage your profile and preferences</p>
@@ -211,6 +211,6 @@ export default function SettingsPage() {
           </button>
         </div>
       </form>
-    </main>
+    </div>
   );
 }

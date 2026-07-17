@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { DashboardNav } from "@/components/DashboardNav";
-import { ThemeApplier } from "@/components/ThemeApplier";
+import { DashboardShell } from "@/components/DashboardShell";
 
 export default async function DashboardLayout({
   children,
@@ -15,19 +14,25 @@ export default async function DashboardLayout({
 
   if (!user) redirect("/login");
 
-  const { data: settings } = await supabase
-    .from("user_settings")
-    .select("theme")
-    .eq("id", user.id)
-    .maybeSingle();
+  const [settingsResult, profileResult] = await Promise.all([
+    supabase.from("user_settings").select("theme").eq("id", user.id).maybeSingle(),
+    supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle(),
+  ]);
 
-  const theme = settings?.theme ?? "system";
+  const theme = settingsResult.data?.theme ?? "system";
+  const displayName: string =
+    profileResult.data?.display_name ??
+    user.user_metadata?.display_name ??
+    user.email?.split("@")[0] ??
+    "Account";
 
   return (
-    <div className="flex flex-1 flex-col">
-      <ThemeApplier theme={theme} />
-      <DashboardNav />
+    <DashboardShell
+      displayName={displayName}
+      email={user.email ?? ""}
+      theme={theme}
+    >
       {children}
-    </div>
+    </DashboardShell>
   );
 }

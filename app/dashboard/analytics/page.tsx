@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -45,7 +45,7 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-10">
+      <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
         <p className="text-muted">Loading analytics…</p>
       </main>
     );
@@ -53,7 +53,7 @@ export default function AnalyticsPage() {
 
   if (error) {
     return (
-      <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-10">
+      <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
         <p className="text-negative">{error}</p>
       </main>
     );
@@ -67,7 +67,7 @@ export default function AnalyticsPage() {
   const hasData = data.expenseCount > 0;
 
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-10">
+    <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
       <div className="mb-8 flex items-end justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Analytics</h1>
@@ -235,7 +235,7 @@ export default function AnalyticsPage() {
           )}
         </div>
       )}
-    </main>
+    </div>
   );
 }
 

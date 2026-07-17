@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useState } from "react";
 
@@ -54,7 +54,7 @@ export default function NotificationsPage() {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10">
+    <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold">Notifications</h1>
@@ -129,6 +129,6 @@ export default function NotificationsPage() {
           ))}
         </ul>
       )}
-    </main>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import { fromCents, toCents } from "@/lib/money";
 
@@ -143,7 +143,7 @@ export default function SavingsPage() {
 
   if (loading) {
     return (
-      <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-10">
+      <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
         <p className="text-sm text-muted">Loading...</p>
       </main>
     );
@@ -153,7 +153,7 @@ export default function SavingsPage() {
   const completedGoals = goals.filter((g) => g.completed);
 
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-10">
+    <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Savings Goals</h1>
@@ -413,6 +413,6 @@ export default function SavingsPage() {
           )}
         </div>
       )}
-    </main>
+    </div>
   );
 }

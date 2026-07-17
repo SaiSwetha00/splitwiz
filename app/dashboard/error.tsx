@@ -15,7 +15,7 @@ export default function DashboardError({
   }, [error]);
 
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-20 text-center">
+    <div className="mx-auto w-full max-w-4xl px-4 py-20 text-center">
       <p className="mb-4 text-4xl">⚠️</p>
       <p className="text-lg font-semibold">Dashboard error</p>
       <p className="mt-2 text-sm text-muted">
@@ -38,6 +38,6 @@ export default function DashboardError({
           Go home
         </Link>
       </div>
-    </main>
+    </div>
   );
 }
