@@ -44,6 +44,8 @@ export default function BudgetsPage() {
   const [endDate, setEndDate] = useState("");
   const [categoryId, setCategoryId] = useState("");
 
+  useEffect(() => { document.title = "Budgets — Splitwiz"; }, []);
+
   useEffect(() => {
     Promise.all([
       fetch("/api/budgets").then((r) => r.json()),

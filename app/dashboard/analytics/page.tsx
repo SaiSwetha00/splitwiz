@@ -32,6 +32,8 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => { document.title = "Analytics — Splitwiz"; }, []);
+
   useEffect(() => {
     fetch("/api/analytics")
       .then((r) => r.json())
@@ -112,7 +114,7 @@ export default function AnalyticsPage() {
             Add expenses to your trips to see spending analytics here.
           </p>
           <Link
-            href="/"
+            href="/dashboard/trips/new"
             className="rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground"
           >
             Create a trip

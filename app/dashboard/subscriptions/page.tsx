@@ -43,6 +43,8 @@ export default function SubscriptionsPage() {
   const [nextBilling, setNextBilling] = useState("");
   const [categoryId, setCategoryId] = useState("");
 
+  useEffect(() => { document.title = "Subscriptions — Splitwiz"; }, []);
+
   useEffect(() => {
     Promise.all([
       fetch("/api/subscriptions").then((r) => r.json()),

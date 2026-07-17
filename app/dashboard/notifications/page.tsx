@@ -25,6 +25,8 @@ export default function NotificationsPage() {
     setLoading(false);
   }, []);
 
+  useEffect(() => { document.title = "Notifications — Splitwiz"; }, []);
+
   useEffect(() => {
     void fetchNotifications();
   }, [fetchNotifications]);

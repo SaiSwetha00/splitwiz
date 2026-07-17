@@ -39,6 +39,8 @@ export default function SavingsPage() {
   const [fundAmount, setFundAmount] = useState("");
   const [addingFunds, setAddingFunds] = useState(false);
 
+  useEffect(() => { document.title = "Savings — Splitwiz"; }, []);
+
   useEffect(() => {
     fetch("/api/savings")
       .then((r) => r.json())

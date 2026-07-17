@@ -33,6 +33,8 @@ export default function SettingsPage() {
   const [saveError, setSaveError] = useState("");
   const [saveSuccess, setSaveSuccess] = useState(false);
 
+  useEffect(() => { document.title = "Settings — Splitwiz"; }, []);
+
   useEffect(() => {
     fetch("/api/settings")
       .then((r) => r.json())
