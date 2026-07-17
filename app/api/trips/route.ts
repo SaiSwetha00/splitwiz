@@ -57,8 +57,9 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (tripError || !trip) {
+    console.error("Trip insert error:", tripError);
     return NextResponse.json(
-      { error: "Failed to create trip" },
+      { error: "Failed to create trip", detail: tripError?.message },
       { status: 500 }
     );
   }
