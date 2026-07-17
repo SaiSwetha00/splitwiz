@@ -34,21 +34,19 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Protect /dashboard — redirect unauthenticated visitors to login.
-  if (!user && request.nextUrl.pathname.startsWith("/dashboard")) {
+  const { pathname } = request.nextUrl;
+
+  // Authenticated users: redirect away from marketing/auth pages.
+  if (user && (pathname === "/" || pathname === "/login" || pathname === "/signup")) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = "/dashboard";
     return NextResponse.redirect(url);
   }
 
-  // Redirect authenticated users away from login/signup.
-  if (
-    user &&
-    (request.nextUrl.pathname === "/login" ||
-      request.nextUrl.pathname === "/signup")
-  ) {
+  // Unauthenticated users: redirect away from / and protected routes.
+  if (!user && (pathname === "/" || pathname.startsWith("/dashboard"))) {
     const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
+    url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
