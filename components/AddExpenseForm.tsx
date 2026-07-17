@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Expense, TripState } from "@/lib/types";
 import { formatMoney, splitEqual, toCents } from "@/lib/money";
 import { Field, inputClass } from "./ui";
@@ -58,8 +58,34 @@ export default function AddExpenseForm({
     }
   );
 
+  const [suggestedCategory, setSuggestedCategory] = useState<string | null>(null);
+  const [suggesting, setSuggesting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (description.trim().length < 3) {
+      setSuggestedCategory(null);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      setSuggesting(true);
+      try {
+        const res = await fetch("/api/ai/categorize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ description: description.trim() }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setSuggestedCategory(data.category ?? null);
+        }
+      } finally {
+        setSuggesting(false);
+      }
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [description]);
 
   const totalCents = toCents(amount || 0);
   const selectedIds = trip.members
@@ -192,6 +218,21 @@ export default function AddExpenseForm({
                   </option>
                 ))}
               </select>
+              {suggesting && (
+                <p className="mt-1 text-xs text-muted">✨ Thinking…</p>
+              )}
+              {!suggesting &&
+                suggestedCategory &&
+                suggestedCategory !== category && (
+                  <button
+                    type="button"
+                    onClick={() => setCategory(suggestedCategory)}
+                    className="mt-1 inline-flex items-center gap-1 rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent"
+                  >
+                    <span>✨</span>
+                    <span>{suggestedCategory}</span>
+                  </button>
+                )}
             </Field>
           </div>
 

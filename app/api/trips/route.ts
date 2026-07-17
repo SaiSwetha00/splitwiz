@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { createClient } from "@/lib/supabase/server";
 import { generateUniqueCode } from "@/lib/tripService";
 import { SUPPORTED_CURRENCIES } from "@/lib/money";
+import { logActivity } from "@/lib/activity";
 
-// POST /api/trips  — create a new trip with its members.
+// POST /api/trips — create a new trip with its initial members.
 export async function POST(request: NextRequest) {
   let body: unknown;
   try {
@@ -42,15 +43,48 @@ export async function POST(request: NextRequest) {
   }
 
   const code = await generateUniqueCode();
+  const supabase = await createClient();
 
-  const trip = await prisma.trip.create({
-    data: {
-      code,
-      name: tripName,
-      currency: cur,
-      members: { create: memberNames.map((n) => ({ name: n })) },
-    },
-  });
+  // Associate the trip with the logged-in user, if any.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { data: trip, error: tripError } = await supabase
+    .from("trips")
+    .insert({ code, name: tripName, currency: cur, user_id: user?.id ?? null })
+    .select("id, code")
+    .single();
+
+  if (tripError || !trip) {
+    return NextResponse.json(
+      { error: "Failed to create trip" },
+      { status: 500 }
+    );
+  }
+
+  const { error: membersError } = await supabase
+    .from("members")
+    .insert(memberNames.map((n) => ({ trip_id: trip.id, name: n })));
+
+  if (membersError) {
+    await supabase.from("trips").delete().eq("id", trip.id);
+    return NextResponse.json(
+      { error: "Failed to create members" },
+      { status: 500 }
+    );
+  }
+
+  if (user) {
+    logActivity({
+      userId: user.id,
+      tripId: trip.id,
+      action: "trip_created",
+      entityType: "trips",
+      entityId: trip.id,
+      metadata: { name: tripName, code: trip.code, currency: cur },
+    });
+  }
 
   return NextResponse.json({ code: trip.code }, { status: 201 });
 }

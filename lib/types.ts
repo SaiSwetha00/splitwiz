@@ -44,4 +44,6 @@ export type TripState = {
   expenses: Expense[];
   balances: Balance[];
   settlements: Settlement[];
+  userRole: string | null;
+  isOwned: boolean;
 };

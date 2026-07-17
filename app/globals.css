@@ -40,6 +40,31 @@
   }
 }
 
+/* Explicit theme overrides (set via data-theme by ThemeApplier) */
+:root[data-theme="light"] {
+  --background: #f6f7f9;
+  --surface: #ffffff;
+  --foreground: #171717;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --accent: #4f46e5;
+  --accent-foreground: #ffffff;
+  --positive: #059669;
+  --negative: #dc2626;
+}
+
+:root[data-theme="dark"] {
+  --background: #0b0c10;
+  --surface: #16181d;
+  --foreground: #ededed;
+  --muted: #9aa0ac;
+  --border: #262a33;
+  --accent: #6366f1;
+  --accent-foreground: #ffffff;
+  --positive: #34d399;
+  --negative: #f87171;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

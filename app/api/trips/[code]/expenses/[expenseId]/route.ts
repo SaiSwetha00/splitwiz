@@ -1,19 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { createClient } from "@/lib/supabase/server";
 import { parseExpenseInput } from "@/lib/expenseInput";
-
-async function findExpense(code: string, expenseId: string) {
-  const trip = await prisma.trip.findUnique({
-    where: { code: code.toUpperCase() },
-    include: { members: true },
-  });
-  if (!trip) return { error: "Trip not found" as const, status: 404 };
-  const expense = await prisma.expense.findFirst({
-    where: { id: expenseId, tripId: trip.id },
-  });
-  if (!expense) return { error: "Expense not found" as const, status: 404 };
-  return { trip, expense };
-}
+import type { Json } from "@/lib/supabase/database.types";
+import { checkTripWrite } from "@/lib/auth/tripAccess";
+import { logActivity } from "@/lib/activity";
 
 // PATCH /api/trips/:code/expenses/:expenseId — replace an expense's details.
 export async function PATCH(
@@ -21,9 +11,32 @@ export async function PATCH(
   { params }: { params: Promise<{ code: string; expenseId: string }> }
 ) {
   const { code, expenseId } = await params;
-  const found = await findExpense(code, expenseId);
-  if ("error" in found) {
-    return NextResponse.json({ error: found.error }, { status: found.status });
+  const supabase = await createClient();
+
+  const { data: trip, error: tripError } = await supabase
+    .from("trips")
+    .select("id, user_id, members(id)")
+    .eq("code", code.toUpperCase())
+    .single();
+
+  if (tripError || !trip) {
+    return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+  }
+
+  const access = await checkTripWrite(supabase, trip.id, trip.user_id ?? null);
+  if (!access.ok) {
+    return NextResponse.json({ error: access.error }, { status: access.status });
+  }
+
+  const { data: expense, error: expenseError } = await supabase
+    .from("expenses")
+    .select("id")
+    .eq("id", expenseId)
+    .eq("trip_id", trip.id)
+    .maybeSingle();
+
+  if (expenseError || !expense) {
+    return NextResponse.json({ error: "Expense not found" }, { status: 404 });
   }
 
   let body: unknown;
@@ -33,7 +46,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const validIds = new Set(found.trip.members.map((m) => m.id));
+  const validIds = new Set(trip.members.map((m) => m.id));
   const parsed = parseExpenseInput(body, validIds);
   if ("error" in parsed) {
     return NextResponse.json({ error: parsed.error }, { status: 400 });
@@ -41,21 +54,37 @@ export async function PATCH(
   const { description, amountCents, category, paidById, splitType, shares } =
     parsed.data;
 
-  // Replace shares atomically along with the expense fields.
-  await prisma.$transaction([
-    prisma.expenseShare.deleteMany({ where: { expenseId } }),
-    prisma.expense.update({
-      where: { id: expenseId },
-      data: {
-        description,
-        amount: amountCents,
-        category,
-        paidById,
-        splitType,
-        shares: { create: shares },
-      },
-    }),
-  ]);
+  // Atomically replace shares and update the expense via a PostgreSQL function.
+  const { error } = await supabase.rpc("update_expense_with_shares", {
+    p_expense_id: expenseId,
+    p_description: description,
+    p_amount_cents: amountCents,
+    p_category: category,
+    p_paid_by_id: paidById,
+    p_split_type: splitType,
+    p_shares: shares.map((s) => ({
+      member_id: s.memberId,
+      amount_cents: s.amount,
+    })) as unknown as Json,
+  });
+
+  if (error) {
+    return NextResponse.json(
+      { error: "Failed to update expense" },
+      { status: 500 }
+    );
+  }
+
+  if (trip.user_id && access.userId) {
+    logActivity({
+      userId: access.userId,
+      tripId: trip.id,
+      action: "expense_updated",
+      entityType: "expenses",
+      entityId: expenseId,
+      metadata: { description, amount_cents: amountCents },
+    });
+  }
 
   return NextResponse.json({ id: expenseId });
 }
@@ -66,10 +95,57 @@ export async function DELETE(
   { params }: { params: Promise<{ code: string; expenseId: string }> }
 ) {
   const { code, expenseId } = await params;
-  const found = await findExpense(code, expenseId);
-  if ("error" in found) {
-    return NextResponse.json({ error: found.error }, { status: found.status });
+  const supabase = await createClient();
+
+  const { data: trip, error: tripError } = await supabase
+    .from("trips")
+    .select("id, user_id")
+    .eq("code", code.toUpperCase())
+    .single();
+
+  if (tripError || !trip) {
+    return NextResponse.json({ error: "Trip not found" }, { status: 404 });
   }
-  await prisma.expense.delete({ where: { id: expenseId } });
+
+  const access = await checkTripWrite(supabase, trip.id, trip.user_id ?? null);
+  if (!access.ok) {
+    return NextResponse.json({ error: access.error }, { status: access.status });
+  }
+
+  const { data: expense, error: expenseError } = await supabase
+    .from("expenses")
+    .select("id, description")
+    .eq("id", expenseId)
+    .eq("trip_id", trip.id)
+    .maybeSingle();
+
+  if (expenseError || !expense) {
+    return NextResponse.json({ error: "Expense not found" }, { status: 404 });
+  }
+
+  // Cascade delete in the DB removes expense_shares automatically.
+  const { error } = await supabase
+    .from("expenses")
+    .delete()
+    .eq("id", expenseId);
+
+  if (error) {
+    return NextResponse.json(
+      { error: "Failed to delete expense" },
+      { status: 500 }
+    );
+  }
+
+  if (trip.user_id && access.userId) {
+    logActivity({
+      userId: access.userId,
+      tripId: trip.id,
+      action: "expense_deleted",
+      entityType: "expenses",
+      entityId: expenseId,
+      metadata: { description: expense.description },
+    });
+  }
+
   return NextResponse.json({ ok: true });
 }
