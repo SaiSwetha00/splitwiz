@@ -1,4 +1,4 @@
-import { createClient } from "./supabase/server";
+import { createClient, createAdminClient } from "./supabase/server";
 import { computeBalances, computeSettlements } from "./balances";
 import { resolveUserRole } from "./auth/tripAccess";
 
@@ -13,10 +13,10 @@ export function generateCode(length = 6): string {
 }
 
 export async function generateUniqueCode(): Promise<string> {
-  const supabase = await createClient();
+  const admin = createAdminClient();
   for (let attempt = 0; attempt < 10; attempt++) {
     const code = generateCode();
-    const { data } = await supabase
+    const { data } = await admin
       .from("trips")
       .select("id")
       .eq("code", code)
@@ -27,9 +27,10 @@ export async function generateUniqueCode(): Promise<string> {
 }
 
 export async function loadTripState(code: string) {
+  const admin = createAdminClient();
   const supabase = await createClient();
 
-  const { data: trip, error: tripError } = await supabase
+  const { data: trip, error: tripError } = await admin
     .from("trips")
     .select("id, code, name, currency, created_at, user_id")
     .eq("code", code.toUpperCase())
@@ -38,12 +39,12 @@ export async function loadTripState(code: string) {
   if (tripError || !trip) return null;
 
   const [membersResult, expensesResult] = await Promise.all([
-    supabase
+    admin
       .from("members")
       .select("id, name, created_at")
       .eq("trip_id", trip.id)
       .order("created_at", { ascending: true }),
-    supabase
+    admin
       .from("expenses")
       .select("id, description, amount_cents, category, split_type, created_at, paid_by_id")
       .eq("trip_id", trip.id)
@@ -59,7 +60,7 @@ export async function loadTripState(code: string) {
     amount_cents: number;
   }> = [];
   if (expenses.length > 0) {
-    const { data } = await supabase
+    const { data } = await admin
       .from("expense_shares")
       .select("expense_id, member_id, amount_cents")
       .in(
