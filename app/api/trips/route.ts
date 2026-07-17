@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { generateUniqueCode } from "@/lib/tripService";
 import { SUPPORTED_CURRENCIES } from "@/lib/money";
 import { logActivity } from "@/lib/activity";
@@ -44,13 +44,15 @@ export async function POST(request: NextRequest) {
 
   const code = await generateUniqueCode();
   const supabase = await createClient();
+  const admin = createAdminClient();
 
-  // Associate the trip with the logged-in user, if any.
+  // Verify auth — user client reads the session cookie.
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: trip, error: tripError } = await supabase
+  // Use admin client for writes so missing GRANTs don't block.
+  const { data: trip, error: tripError } = await admin
     .from("trips")
     .insert({ code, name: tripName, currency: cur, user_id: user?.id ?? null })
     .select("id, code")
@@ -64,12 +66,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { error: membersError } = await supabase
+  const { error: membersError } = await admin
     .from("members")
     .insert(memberNames.map((n) => ({ trip_id: trip.id, name: n })));
 
   if (membersError) {
-    await supabase.from("trips").delete().eq("id", trip.id);
+    await admin.from("trips").delete().eq("id", trip.id);
     return NextResponse.json(
       { error: "Failed to create members" },
       { status: 500 }

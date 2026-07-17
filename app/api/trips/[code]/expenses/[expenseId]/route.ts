@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { parseExpenseInput } from "@/lib/expenseInput";
 import type { Json } from "@/lib/supabase/database.types";
 import { checkTripWrite } from "@/lib/auth/tripAccess";
@@ -12,8 +12,9 @@ export async function PATCH(
 ) {
   const { code, expenseId } = await params;
   const supabase = await createClient();
+  const admin = createAdminClient();
 
-  const { data: trip, error: tripError } = await supabase
+  const { data: trip, error: tripError } = await admin
     .from("trips")
     .select("id, user_id, members(id)")
     .eq("code", code.toUpperCase())
@@ -28,7 +29,7 @@ export async function PATCH(
     return NextResponse.json({ error: access.error }, { status: access.status });
   }
 
-  const { data: expense, error: expenseError } = await supabase
+  const { data: expense, error: expenseError } = await admin
     .from("expenses")
     .select("id")
     .eq("id", expenseId)
@@ -55,7 +56,7 @@ export async function PATCH(
     parsed.data;
 
   // Atomically replace shares and update the expense via a PostgreSQL function.
-  const { error } = await supabase.rpc("update_expense_with_shares", {
+  const { error } = await admin.rpc("update_expense_with_shares", {
     p_expense_id: expenseId,
     p_description: description,
     p_amount_cents: amountCents,
@@ -96,8 +97,9 @@ export async function DELETE(
 ) {
   const { code, expenseId } = await params;
   const supabase = await createClient();
+  const admin = createAdminClient();
 
-  const { data: trip, error: tripError } = await supabase
+  const { data: trip, error: tripError } = await admin
     .from("trips")
     .select("id, user_id")
     .eq("code", code.toUpperCase())
@@ -112,7 +114,7 @@ export async function DELETE(
     return NextResponse.json({ error: access.error }, { status: access.status });
   }
 
-  const { data: expense, error: expenseError } = await supabase
+  const { data: expense, error: expenseError } = await admin
     .from("expenses")
     .select("id, description")
     .eq("id", expenseId)
@@ -124,7 +126,7 @@ export async function DELETE(
   }
 
   // Cascade delete in the DB removes expense_shares automatically.
-  const { error } = await supabase
+  const { error } = await admin
     .from("expenses")
     .delete()
     .eq("id", expenseId);

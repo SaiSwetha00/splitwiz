@@ -11,7 +11,7 @@ export async function PATCH(
   const { id } = await params;
   const auth = await requireAuth();
   if (!auth.ok) return auth.response;
-  const { user, supabase } = auth;
+  const { user, admin } = auth;
 
   let body: unknown;
   try {
@@ -38,7 +38,7 @@ export async function PATCH(
   if (end_date !== undefined) update.end_date = end_date;
   if (category_id !== undefined) update.category_id = category_id;
 
-  const { data: budget, error } = await supabase
+  const { data: budget, error } = await admin
     .from("budgets")
     .update(update)
     .eq("id", id)
@@ -62,9 +62,9 @@ export async function DELETE(
   const { id } = await params;
   const auth = await requireAuth();
   if (!auth.ok) return auth.response;
-  const { user, supabase } = auth;
+  const { user, admin } = auth;
 
-  const { error } = await supabase
+  const { error } = await admin
     .from("budgets")
     .delete()
     .eq("id", id)

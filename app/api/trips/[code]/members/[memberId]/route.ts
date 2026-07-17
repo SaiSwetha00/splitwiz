@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { checkTripWrite } from "@/lib/auth/tripAccess";
 
 // DELETE /api/trips/:code/members/:memberId — remove a member.
@@ -10,8 +10,9 @@ export async function DELETE(
 ) {
   const { code, memberId } = await params;
   const supabase = await createClient();
+  const admin = createAdminClient();
 
-  const { data: trip, error: tripError } = await supabase
+  const { data: trip, error: tripError } = await admin
     .from("trips")
     .select("id, user_id")
     .eq("code", code.toUpperCase())
@@ -26,7 +27,7 @@ export async function DELETE(
     return NextResponse.json({ error: access.error }, { status: access.status });
   }
 
-  const { data: member, error: memberError } = await supabase
+  const { data: member, error: memberError } = await admin
     .from("members")
     .select("id")
     .eq("id", memberId)
@@ -39,11 +40,11 @@ export async function DELETE(
 
   // Check if the member is referenced by any expenses.
   const [paidResult, shareResult] = await Promise.all([
-    supabase
+    admin
       .from("expenses")
       .select("id", { count: "exact", head: true })
       .eq("paid_by_id", memberId),
-    supabase
+    admin
       .from("expense_shares")
       .select("id", { count: "exact", head: true })
       .eq("member_id", memberId),
@@ -62,7 +63,7 @@ export async function DELETE(
     );
   }
 
-  const { error } = await supabase
+  const { error } = await admin
     .from("members")
     .delete()
     .eq("id", memberId);

@@ -7,9 +7,9 @@ export async function PATCH(_request: Request, { params }: RouteParams) {
   const { id } = await params;
   const auth = await requireAuth();
   if (!auth.ok) return auth.response;
-  const { user, supabase } = auth;
+  const { user, admin } = auth;
 
-  const { error } = await supabase
+  const { error } = await admin
     .from("ai_insights")
     .update({ dismissed: true })
     .eq("id", id)

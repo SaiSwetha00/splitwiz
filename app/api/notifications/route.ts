@@ -5,9 +5,9 @@ import { requireAuth } from "@/lib/auth/requireAuth";
 export async function GET() {
   const auth = await requireAuth();
   if (!auth.ok) return auth.response;
-  const { user, supabase } = auth;
+  const { user, admin } = auth;
 
-  const { data } = await supabase
+  const { data } = await admin
     .from("notifications")
     .select("*")
     .eq("user_id", user.id)
@@ -24,9 +24,9 @@ export async function GET() {
 export async function PATCH() {
   const auth = await requireAuth();
   if (!auth.ok) return auth.response;
-  const { user, supabase } = auth;
+  const { user, admin } = auth;
 
-  await supabase
+  await admin
     .from("notifications")
     .update({ read: true })
     .eq("user_id", user.id)

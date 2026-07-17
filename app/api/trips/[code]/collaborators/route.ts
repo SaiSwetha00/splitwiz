@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { checkTripWrite } from "@/lib/auth/tripAccess";
 import { logActivity } from "@/lib/activity";
 import { createNotification } from "@/lib/notifications";
@@ -13,8 +12,9 @@ export async function GET(
 ) {
   const { code } = await params;
   const supabase = await createClient();
+  const adminClient = createAdminClient();
 
-  const { data: trip } = await supabase
+  const { data: trip } = await adminClient
     .from("trips")
     .select("id, user_id")
     .eq("code", code.toUpperCase())
@@ -43,7 +43,7 @@ export async function GET(
 
   const isCreator = trip.user_id === user.id;
   if (!isCreator) {
-    const { data: collab } = await supabase
+    const { data: collab } = await adminClient
       .from("trip_collaborators")
       .select("role")
       .eq("trip_id", trip.id)
@@ -58,7 +58,7 @@ export async function GET(
     }
   }
 
-  const { data: collaborators } = await supabase
+  const { data: collaborators } = await adminClient
     .from("trip_collaborators")
     .select("id, user_id, role, joined_at")
     .eq("trip_id", trip.id)
@@ -70,7 +70,7 @@ export async function GET(
 
   // Fetch profiles for display names.
   const userIds = collaborators.map((c) => c.user_id);
-  const { data: profiles } = await supabase
+  const { data: profiles } = await adminClient
     .from("profiles")
     .select("id, display_name, avatar_url")
     .in("id", userIds);
@@ -96,8 +96,9 @@ export async function POST(
 ) {
   const { code } = await params;
   const supabase = await createClient();
+  const adminClient = createAdminClient();
 
-  const { data: trip } = await supabase
+  const { data: trip } = await adminClient
     .from("trips")
     .select("id, user_id, name, code")
     .eq("code", code.toUpperCase())
@@ -132,7 +133,6 @@ export async function POST(
   const inviteRole = role === "viewer" ? "viewer" : "editor";
 
   // Look up the user by email using an RPC that queries auth.users.
-  const adminClient = createAdminClient();
   const { data: inviteeId, error: lookupError } = await adminClient.rpc(
     "lookup_user_by_email",
     { p_email: inviteEmail }
@@ -156,7 +156,7 @@ export async function POST(
     );
   }
 
-  const { error: insertError } = await supabase
+  const { error: insertError } = await adminClient
     .from("trip_collaborators")
     .insert({ trip_id: trip.id, user_id: inviteeId, role: inviteRole });
 

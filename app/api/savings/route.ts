@@ -4,9 +4,9 @@ import { requireAuth } from "@/lib/auth/requireAuth";
 export async function GET() {
   const auth = await requireAuth();
   if (!auth.ok) return auth.response;
-  const { user, supabase } = auth;
+  const { user, admin } = auth;
 
-  const { data: goals, error } = await supabase
+  const { data: goals, error } = await admin
     .from("savings_goals")
     .select("*")
     .eq("user_id", user.id)
@@ -22,7 +22,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const auth = await requireAuth();
   if (!auth.ok) return auth.response;
-  const { user, supabase } = auth;
+  const { user, admin } = auth;
 
   let body: unknown;
   try {
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Target amount must be positive" }, { status: 400 });
   }
 
-  const { data: goal, error } = await supabase
+  const { data: goal, error } = await admin
     .from("savings_goals")
     .insert({
       user_id: user.id,

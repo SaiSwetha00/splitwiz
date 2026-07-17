@@ -8,9 +8,9 @@ export async function PATCH(_request: Request, { params }: RouteParams) {
   const { id } = await params;
   const auth = await requireAuth();
   if (!auth.ok) return auth.response;
-  const { user, supabase } = auth;
+  const { user, admin } = auth;
 
-  await supabase
+  await admin
     .from("notifications")
     .update({ read: true })
     .eq("id", id)

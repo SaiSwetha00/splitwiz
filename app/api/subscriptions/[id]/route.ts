@@ -11,7 +11,7 @@ export async function PATCH(
   const { id } = await params;
   const auth = await requireAuth();
   if (!auth.ok) return auth.response;
-  const { user, supabase } = auth;
+  const { user, admin } = auth;
 
   let body: unknown;
   try {
@@ -50,7 +50,7 @@ export async function PATCH(
   if (active !== undefined) update.active = active;
   if (category_id !== undefined) update.category_id = category_id;
 
-  const { data: subscription, error } = await supabase
+  const { data: subscription, error } = await admin
     .from("subscriptions")
     .update(update)
     .eq("id", id)
@@ -74,9 +74,9 @@ export async function DELETE(
   const { id } = await params;
   const auth = await requireAuth();
   if (!auth.ok) return auth.response;
-  const { user, supabase } = auth;
+  const { user, admin } = auth;
 
-  const { error } = await supabase
+  const { error } = await admin
     .from("subscriptions")
     .delete()
     .eq("id", id)

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { checkTripWrite } from "@/lib/auth/tripAccess";
 import { logActivity } from "@/lib/activity";
 
@@ -10,8 +10,9 @@ export async function POST(
 ) {
   const { code } = await params;
   const supabase = await createClient();
+  const admin = createAdminClient();
 
-  const { data: trip, error: tripError } = await supabase
+  const { data: trip, error: tripError } = await admin
     .from("trips")
     .select("id, user_id")
     .eq("code", code.toUpperCase())
@@ -41,7 +42,7 @@ export async function POST(
     return NextResponse.json({ error: "Name is required" }, { status: 400 });
   }
 
-  const { data: member, error } = await supabase
+  const { data: member, error } = await admin
     .from("members")
     .insert({ trip_id: trip.id, name })
     .select("id, name")

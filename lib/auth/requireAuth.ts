@@ -1,10 +1,15 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import type { User } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 
-type AuthOk = { ok: true; user: User; supabase: SupabaseClient<Database> };
+type AuthOk = {
+  ok: true;
+  user: User;
+  supabase: SupabaseClient<Database>;
+  admin: SupabaseClient<Database>;
+};
 type AuthFail = { ok: false; response: NextResponse };
 
 export async function requireAuth(): Promise<AuthOk | AuthFail> {
@@ -23,5 +28,5 @@ export async function requireAuth(): Promise<AuthOk | AuthFail> {
     };
   }
 
-  return { ok: true, user, supabase };
+  return { ok: true, user, supabase, admin: createAdminClient() };
 }

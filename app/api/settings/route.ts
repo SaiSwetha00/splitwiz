@@ -7,17 +7,17 @@ type SettingsInsert = Database["public"]["Tables"]["user_settings"]["Insert"];
 export async function GET() {
   const auth = await requireAuth();
   if (!auth.ok) return auth.response;
-  const { user, supabase } = auth;
+  const { user, admin } = auth;
 
   // Ensure user_settings row exists (may not exist for users created before Phase 4 trigger).
-  let { data: settings } = await supabase
+  let { data: settings } = await admin
     .from("user_settings")
     .select("*")
     .eq("id", user.id)
     .maybeSingle();
 
   if (!settings) {
-    const { data: created } = await supabase
+    const { data: created } = await admin
       .from("user_settings")
       .insert({ id: user.id })
       .select("*")
@@ -25,7 +25,7 @@ export async function GET() {
     settings = created;
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await admin
     .from("profiles")
     .select("display_name, avatar_url")
     .eq("id", user.id)
@@ -41,7 +41,7 @@ export async function GET() {
 export async function PATCH(request: NextRequest) {
   const auth = await requireAuth();
   if (!auth.ok) return auth.response;
-  const { user, supabase } = auth;
+  const { user, supabase, admin } = auth;
 
   let body: unknown;
   try {
@@ -70,7 +70,7 @@ export async function PATCH(request: NextRequest) {
       upsertData.notifications_enabled = notifications_enabled;
     if (theme !== undefined) upsertData.theme = theme;
 
-    const { error } = await supabase.from("user_settings").upsert(upsertData);
+    const { error } = await admin.from("user_settings").upsert(upsertData);
 
     if (error) {
       return NextResponse.json({ error: "Failed to update settings" }, { status: 500 });
@@ -81,7 +81,7 @@ export async function PATCH(request: NextRequest) {
     const trimmed = display_name.trim();
     if (trimmed) {
       await Promise.all([
-        supabase
+        admin
           .from("profiles")
           .update({ display_name: trimmed })
           .eq("id", user.id),

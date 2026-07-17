@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { checkTripWrite } from "@/lib/auth/tripAccess";
 
 // PATCH /api/trips/:code/collaborators/:userId — change a collaborator's role.
@@ -10,8 +10,9 @@ export async function PATCH(
 ) {
   const { code, userId: targetUserId } = await params;
   const supabase = await createClient();
+  const admin = createAdminClient();
 
-  const { data: trip } = await supabase
+  const { data: trip } = await admin
     .from("trips")
     .select("id, user_id")
     .eq("code", code.toUpperCase())
@@ -49,7 +50,7 @@ export async function PATCH(
     );
   }
 
-  const { error } = await supabase
+  const { error } = await admin
     .from("trip_collaborators")
     .update({ role })
     .eq("trip_id", trip.id)
@@ -73,8 +74,9 @@ export async function DELETE(
 ) {
   const { code, userId: targetUserId } = await params;
   const supabase = await createClient();
+  const admin = createAdminClient();
 
-  const { data: trip } = await supabase
+  const { data: trip } = await admin
     .from("trips")
     .select("id, user_id")
     .eq("code", code.toUpperCase())
@@ -97,7 +99,7 @@ export async function DELETE(
     );
   }
 
-  const { error } = await supabase
+  const { error } = await admin
     .from("trip_collaborators")
     .delete()
     .eq("trip_id", trip.id)

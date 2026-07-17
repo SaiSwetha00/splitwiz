@@ -4,9 +4,9 @@ import { requireAuth } from "@/lib/auth/requireAuth";
 export async function GET() {
   const auth = await requireAuth();
   if (!auth.ok) return auth.response;
-  const { user, supabase } = auth;
+  const { user, admin } = auth;
 
-  const { data: subscriptions, error } = await supabase
+  const { data: subscriptions, error } = await admin
     .from("subscriptions")
     .select(
       "id, name, description, amount_cents, currency, billing_cycle, next_billing_date, active, created_at, category:categories(id, name, icon, color)"
@@ -25,7 +25,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const auth = await requireAuth();
   if (!auth.ok) return auth.response;
-  const { user, supabase } = auth;
+  const { user, admin } = auth;
 
   let body: unknown;
   try {
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
   const validCycles = ["weekly", "monthly", "yearly"];
   const finalCycle = validCycles.includes(billing_cycle ?? "") ? billing_cycle! : "monthly";
 
-  const { data: subscription, error } = await supabase
+  const { data: subscription, error } = await admin
     .from("subscriptions")
     .insert({
       user_id: user.id,

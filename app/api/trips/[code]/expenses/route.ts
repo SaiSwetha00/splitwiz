@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { parseExpenseInput } from "@/lib/expenseInput";
 import { checkTripWrite } from "@/lib/auth/tripAccess";
 import { logActivity } from "@/lib/activity";
@@ -12,8 +12,9 @@ export async function POST(
 ) {
   const { code } = await params;
   const supabase = await createClient();
+  const admin = createAdminClient();
 
-  const { data: trip, error: tripError } = await supabase
+  const { data: trip, error: tripError } = await admin
     .from("trips")
     .select("id, user_id, name, code, currency, members(id)")
     .eq("code", code.toUpperCase())
@@ -43,7 +44,7 @@ export async function POST(
   const { description, amountCents, category, paidById, splitType, shares } =
     parsed.data;
 
-  const { data: expense, error: expenseError } = await supabase
+  const { data: expense, error: expenseError } = await admin
     .from("expenses")
     .insert({
       trip_id: trip.id,
@@ -63,7 +64,7 @@ export async function POST(
     );
   }
 
-  const { error: sharesError } = await supabase.from("expense_shares").insert(
+  const { error: sharesError } = await admin.from("expense_shares").insert(
     shares.map((s) => ({
       expense_id: expense.id,
       member_id: s.memberId,
@@ -72,7 +73,7 @@ export async function POST(
   );
 
   if (sharesError) {
-    await supabase.from("expenses").delete().eq("id", expense.id);
+    await admin.from("expenses").delete().eq("id", expense.id);
     return NextResponse.json(
       { error: "Failed to create expense shares" },
       { status: 500 }

@@ -6,10 +6,10 @@ import { fromCents } from "@/lib/money";
 export async function GET() {
   const auth = await requireAuth();
   if (!auth.ok) return auth.response;
-  const { user, supabase } = auth;
+  const { user, admin } = auth;
 
   const now = new Date().toISOString();
-  const { data } = await supabase
+  const { data } = await admin
     .from("ai_insights")
     .select("*")
     .eq("user_id", user.id)
@@ -23,7 +23,7 @@ export async function GET() {
 export async function POST() {
   const auth = await requireAuth();
   if (!auth.ok) return auth.response;
-  const { user, supabase } = auth;
+  const { user, admin } = auth;
 
   if (!process.env.GROQ_API_KEY) {
     return NextResponse.json(
@@ -33,15 +33,15 @@ export async function POST() {
   }
 
   const [budgetsResult, goalsResult, subsResult] = await Promise.all([
-    supabase
+    admin
       .from("budgets")
       .select("name, amount_cents, period")
       .eq("user_id", user.id),
-    supabase
+    admin
       .from("savings_goals")
       .select("name, target_cents, current_cents, completed")
       .eq("user_id", user.id),
-    supabase
+    admin
       .from("subscriptions")
       .select("name, amount_cents, billing_cycle")
       .eq("user_id", user.id)
@@ -140,7 +140,7 @@ Provide exactly 3 actionable personal finance insights. Reply with a JSON array 
       expires_at: expiry.toISOString(),
     }));
 
-    const { data: inserted } = await supabase
+    const { data: inserted } = await admin
       .from("ai_insights")
       .insert(rows)
       .select("*");
