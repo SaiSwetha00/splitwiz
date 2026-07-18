@@ -449,6 +449,8 @@ export interface Database {
           link: string | null;
           is_read: boolean;
           created_at: string;
+          email_sent: boolean;
+          email_sent_at: string | null;
         };
         Insert: {
           id?: string;
@@ -462,6 +464,8 @@ export interface Database {
           link?: string | null;
           is_read?: boolean;
           created_at?: string;
+          email_sent?: boolean;
+          email_sent_at?: string | null;
         };
         Update: {
           id?: string;
@@ -475,6 +479,8 @@ export interface Database {
           link?: string | null;
           is_read?: boolean;
           created_at?: string;
+          email_sent?: boolean;
+          email_sent_at?: string | null;
         };
         Relationships: [];
       };
@@ -779,6 +785,11 @@ export interface Database {
           note: string | null;
           created_by: string | null;
           created_at: string;
+          razorpay_order_id: string | null;
+          razorpay_payment_id: string | null;
+          payment_status: string;
+          payment_reference: string | null;
+          status: string | null;
         };
         Insert: {
           id?: string;
@@ -790,6 +801,11 @@ export interface Database {
           note?: string | null;
           created_by?: string | null;
           created_at?: string;
+          razorpay_order_id?: string | null;
+          razorpay_payment_id?: string | null;
+          payment_status?: string;
+          payment_reference?: string | null;
+          status?: string | null;
         };
         Update: {
           id?: string;
@@ -800,6 +816,122 @@ export interface Database {
           method?: string;
           note?: string | null;
           created_by?: string | null;
+          created_at?: string;
+          razorpay_order_id?: string | null;
+          razorpay_payment_id?: string | null;
+          payment_status?: string;
+          payment_reference?: string | null;
+          status?: string | null;
+        };
+        Relationships: [];
+      };
+      push_subscriptions: {
+        Row: {
+          id: string;
+          user_id: string;
+          endpoint: string;
+          p256dh: string;
+          auth_key: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          endpoint: string;
+          p256dh: string;
+          auth_key: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          endpoint?: string;
+          p256dh?: string;
+          auth_key?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      expense_comments: {
+        Row: {
+          id: string;
+          expense_id: string;
+          user_id: string;
+          comment: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          expense_id: string;
+          user_id: string;
+          comment: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          expense_id?: string;
+          user_id?: string;
+          comment?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      trip_invites: {
+        Row: {
+          id: string;
+          trip_id: string;
+          token: string;
+          created_by: string;
+          expires_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          trip_id: string;
+          token?: string;
+          created_by: string;
+          expires_at?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          trip_id?: string;
+          token?: string;
+          created_by?: string;
+          expires_at?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      trip_templates: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          trip_type: string | null;
+          default_currency: string;
+          member_names: string[];
+          categories: string[];
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          trip_type?: string | null;
+          default_currency?: string;
+          member_names?: string[];
+          categories?: string[];
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          trip_type?: string | null;
+          default_currency?: string;
+          member_names?: string[];
+          categories?: string[];
           created_at?: string;
         };
         Relationships: [];

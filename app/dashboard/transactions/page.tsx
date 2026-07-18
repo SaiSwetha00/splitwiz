@@ -135,5 +135,12 @@ export default async function TransactionsPage() {
 
   const summary: TransactionSummary = { money_in, money_out, total_owed: 0 };
 
-  return <TransactionsPageClient transactions={transactions} summary={summary} />;
+  const { data: userTrips } = await admin
+    .from("trips")
+    .select("id, name")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(20);
+
+  return <TransactionsPageClient transactions={transactions} summary={summary} trips={userTrips ?? []} />;
 }

@@ -12,7 +12,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const APP_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://splitwiz.app";
+function getAppURL(): string {
+  const site = process.env.NEXT_PUBLIC_SITE_URL;
+  if (site && !site.includes("localhost")) return site;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return site ?? "https://expense-splitter-two-flax.vercel.app";
+}
+const APP_URL = getAppURL();
 
 export const viewport: Viewport = {
   themeColor: "#6366f1",

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import type { DebtSimplification, TripMember } from '@/types/trips';
 import { currencySymbol } from '@/lib/money';
 
-type PaymentMethod = 'cash' | 'upi' | 'bank' | 'card';
+type PaymentMethod = 'cash' | 'upi' | 'online' | 'bank' | 'card';
 
 interface SavedCard {
   id: string;
@@ -24,10 +24,10 @@ interface Props {
 }
 
 const METHOD_OPTIONS: { key: PaymentMethod; emoji: string; label: string; desc: string }[] = [
-  { key: 'cash',  emoji: '💵', label: 'Cash',          desc: 'Settled in person' },
-  { key: 'upi',   emoji: '📱', label: 'UPI',           desc: 'Google Pay, PhonePe, Paytm…' },
-  { key: 'bank',  emoji: '🏦', label: 'Bank Transfer', desc: 'NEFT / IMPS / RTGS' },
-  { key: 'card',  emoji: '💳', label: 'Card',          desc: 'Debit or credit card' },
+  { key: 'cash',   emoji: '💵', label: 'Cash',          desc: 'Settled in person' },
+  { key: 'upi',    emoji: '📱', label: 'UPI',           desc: 'Google Pay, PhonePe, Paytm…' },
+  { key: 'online', emoji: '💳', label: 'Pay Online',    desc: 'Razorpay — cards & more' },
+  { key: 'bank',   emoji: '🏦', label: 'Bank Transfer', desc: 'NEFT / IMPS / RTGS' },
 ];
 
 function paidByName(debt: DebtSimplification): string {
@@ -87,6 +87,12 @@ function ConfettiCanvas({ show }: { show: boolean }) {
   );
 }
 
+declare global {
+  interface Window {
+    Razorpay: new (options: Record<string, unknown>) => { open(): void };
+  }
+}
+
 export function SettlePaymentModal({ debt, currency, tripId, onClose, onSettled, showToast }: Props) {
   const sym = currencySymbol(currency);
   const [method, setMethod] = useState<PaymentMethod>('cash');
@@ -118,7 +124,84 @@ export function SettlePaymentModal({ debt, currency, tripId, onClose, onSettled,
       .catch(() => undefined);
   }, [method]);
 
+  function loadRazorpayScript(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (window.Razorpay) { resolve(); return; }
+      const s = document.createElement('script');
+      s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error('Failed to load Razorpay'));
+      document.head.appendChild(s);
+    });
+  }
+
+  async function handleOnlinePayment() {
+    setSaving(true);
+    try {
+      // Create settlement record first
+      const settlementRes = await fetch(`/api/trips2/${tripId}/settlements`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from_member_id: debt.from_member_id,
+          to_member_id: debt.to_member_id,
+          amount: debt.amount,
+          method: 'online',
+        }),
+      });
+      if (!settlementRes.ok) {
+        const d = await settlementRes.json() as { error?: string };
+        showToast(d.error ?? 'Failed to create settlement'); return;
+      }
+      const { id: settlementId } = await settlementRes.json() as { id: string };
+
+      // Create Razorpay order
+      const orderRes = await fetch('/api/payments/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: debt.amount, currency: 'INR', settlementId }),
+      });
+      if (!orderRes.ok) {
+        const d = await orderRes.json() as { error?: string };
+        showToast(d.error ?? 'Payment service unavailable'); return;
+      }
+      const order = await orderRes.json() as { orderId: string; amount: number; currency: string; keyId: string };
+
+      await loadRazorpayScript();
+
+      const rzp = new window.Razorpay({
+        key: order.keyId,
+        amount: order.amount,
+        currency: order.currency,
+        name: 'SplitWiz',
+        description: 'Settlement Payment',
+        order_id: order.orderId,
+        handler: async (resp: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) => {
+          const verifyRes = await fetch('/api/payments/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...resp, settlementId }),
+          });
+          if (verifyRes.ok) {
+            setDone(true);
+            setTimeout(() => { onSettled(); onClose(); }, 1800);
+          } else {
+            showToast('Payment verification failed');
+          }
+        },
+        prefill: { name: debt.from_member?.name ?? '' },
+        theme: { color: '#6366f1' },
+        modal: { ondismiss: () => setSaving(false) },
+      });
+      rzp.open();
+    } catch {
+      showToast('Payment failed. Please try again.');
+      setSaving(false);
+    }
+  }
+
   async function confirm() {
+    if (method === 'online') { await handleOnlinePayment(); return; }
     setSaving(true);
     try {
       const note = reference.trim() || null;
@@ -144,7 +227,6 @@ export function SettlePaymentModal({ debt, currency, tripId, onClose, onSettled,
       }
 
       setDone(true);
-      // Show confetti briefly then close
       setTimeout(() => {
         onSettled();
         onClose();

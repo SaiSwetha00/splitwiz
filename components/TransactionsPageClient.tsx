@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import type { Transaction, TransactionSummary, TransactionType, TransactionStatus } from "@/types/transactions";
 import { CsvImporter } from "./CsvImporter";
+import { BankStatementImporter } from "./BankStatementImporter";
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
@@ -121,18 +122,22 @@ function exportCsv(transactions: Transaction[]): void {
 
 // ─── component ────────────────────────────────────────────────────────────────
 
+type TripOption = { id: string; name: string };
+
 type Props = {
   transactions: Transaction[];
   summary: TransactionSummary;
+  trips?: TripOption[];
 };
 
-export function TransactionsPageClient({ transactions, summary }: Props) {
+export function TransactionsPageClient({ transactions, summary, trips = [] }: Props) {
   const [tab, setTab] = useState<FilterTab>("all");
   const [dateRange, setDateRange] = useState<string>("all");
   const [searchRaw, setSearchRaw] = useState("");
   const [search, setSearch] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showImporter, setShowImporter] = useState(false);
+  const [showBankImporter, setShowBankImporter] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Debounce search
@@ -193,6 +198,12 @@ export function TransactionsPageClient({ transactions, summary }: Props) {
           <p className="mt-0.5 text-sm text-muted">All your payments and settlements</p>
         </div>
         <div className="flex shrink-0 gap-2">
+          <button
+            onClick={() => setShowBankImporter(true)}
+            className="rounded-xl border border-accent bg-accent/10 px-4 py-2.5 text-sm font-medium text-accent hover:bg-accent hover:text-white"
+          >
+            Import Statement
+          </button>
           <button
             onClick={() => setShowImporter(true)}
             className="rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-muted hover:border-accent hover:text-foreground"
@@ -400,6 +411,7 @@ export function TransactionsPageClient({ transactions, summary }: Props) {
       )}
 
       {showImporter && <CsvImporter onClose={() => setShowImporter(false)} />}
+      {showBankImporter && <BankStatementImporter onClose={() => setShowBankImporter(false)} trips={trips} />}
     </div>
   );
 }

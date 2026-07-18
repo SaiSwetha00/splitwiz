@@ -45,6 +45,14 @@ export default function TripDetailPage() {
   const [deleteExpenseId, setDeleteExpenseId] = useState<string | null>(null);
   const [anomalyExpenseId, setAnomalyExpenseId] = useState<string | null>(null);
   const anomalyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [inviteLink, setInviteLink] = useState<string | null>(null);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [savingTemplate, setSavingTemplate] = useState(false);
+  const [commentExpenseId, setCommentExpenseId] = useState<string | null>(null);
+  const [comments, setComments] = useState<{ id: string; comment: string; created_at: string; display_name: string; is_mine: boolean }[]>([]);
+  const [commentText, setCommentText] = useState('');
+  const [commentLoading, setCommentLoading] = useState(false);
+  const [commentPosting, setCommentPosting] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -97,6 +105,65 @@ export default function TripDetailPage() {
       showToast(wasEditing ? 'Expense updated ✓' : 'Expense added ✓');
     }
     void load();
+  }
+
+  async function createInviteLink() {
+    const res = await fetch(`/api/trips2/${id}/invite`, { method: 'POST' });
+    if (!res.ok) { showToast('Failed to create invite link'); return; }
+    const { token } = await res.json() as { token: string };
+    const link = `${window.location.origin}/join/${token}`;
+    setInviteLink(link);
+    setShowInviteModal(true);
+  }
+
+  async function saveAsTemplate() {
+    if (!data) return;
+    const name = prompt(`Template name:`, `${data.trip.name} template`);
+    if (!name) return;
+    setSavingTemplate(true);
+    const res = await fetch('/api/trip-templates', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, tripId: id }),
+    });
+    setSavingTemplate(false);
+    if (res.ok) showToast('Template saved! ✓');
+    else showToast('Failed to save template');
+  }
+
+  async function openComments(expenseId: string) {
+    if (commentExpenseId === expenseId) { setCommentExpenseId(null); return; }
+    setCommentExpenseId(expenseId);
+    setCommentText('');
+    setCommentLoading(true);
+    try {
+      const res = await fetch(`/api/trips2/${id}/expenses/${expenseId}/comments`);
+      if (res.ok) {
+        const d = await res.json() as { comments: typeof comments };
+        setComments(d.comments);
+      }
+    } finally {
+      setCommentLoading(false);
+    }
+  }
+
+  async function postComment() {
+    if (!commentExpenseId || !commentText.trim()) return;
+    setCommentPosting(true);
+    try {
+      const res = await fetch(`/api/trips2/${id}/expenses/${commentExpenseId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ comment: commentText.trim() }),
+      });
+      if (res.ok) {
+        const c = await res.json() as (typeof comments)[0];
+        setComments(prev => [...prev, c]);
+        setCommentText('');
+      }
+    } finally {
+      setCommentPosting(false);
+    }
   }
 
   function handleAnomalyConfirm() {
@@ -163,12 +230,25 @@ export default function TripDetailPage() {
                 <circle cx="12" cy="5" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="12" cy="19" r="1.5" />
               </svg>
             </button>
-            <div className="absolute right-0 top-full z-20 mt-1 hidden min-w-[140px] rounded-xl border border-border bg-surface p-1 shadow-lg group-focus-within:block group-hover:block">
+            <div className="absolute right-0 top-full z-20 mt-1 hidden min-w-[160px] rounded-xl border border-border bg-surface p-1 shadow-lg group-focus-within:block group-hover:block">
+              <button
+                onClick={() => void createInviteLink()}
+                className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-accent/10 transition-colors"
+              >
+                🔗 Invite Members
+              </button>
+              <button
+                onClick={() => void saveAsTemplate()}
+                disabled={savingTemplate}
+                className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-accent/10 transition-colors"
+              >
+                📋 Save as Template
+              </button>
               <button
                 onClick={() => setDeleteConfirm(true)}
                 className="w-full rounded-lg px-3 py-2 text-left text-sm text-negative hover:bg-negative/10 transition-colors"
               >
-                Delete Trip
+                🗑️ Delete Trip
               </button>
             </div>
           </div>
@@ -288,9 +368,9 @@ export default function TripDetailPage() {
                 const icon = categoryIcon(exp.category, exp.category_icon);
                 const splitCount = exp.splits.length;
                 return (
+                  <div key={exp.id} className="rounded-xl border border-border bg-surface transition-all hover:border-accent/40">
                   <div
-                    key={exp.id}
-                    className="group flex items-center gap-3 rounded-xl border border-border bg-surface p-4 transition-all hover:border-accent/40"
+                    className="group flex items-center gap-3 p-4"
                   >
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-background text-2xl">
                       {icon}
@@ -312,6 +392,12 @@ export default function TripDetailPage() {
                           Edit
                         </button>
                         <button
+                          onClick={() => void openComments(exp.id)}
+                          className="rounded-md px-2 py-1 text-xs text-muted hover:bg-accent/10 hover:text-accent transition-colors"
+                        >
+                          💬
+                        </button>
+                        <button
                           onClick={() => setDeleteExpenseId(exp.id)}
                           className="rounded-md px-2 py-1 text-xs text-negative hover:bg-negative/10 transition-colors"
                         >
@@ -319,6 +405,42 @@ export default function TripDetailPage() {
                         </button>
                       </div>
                     </div>
+                  </div>
+                  {/* Inline comment section */}
+                  {commentExpenseId === exp.id && (
+                    <div style={{ borderTop: '1px solid var(--border)', padding: '0.75rem 1rem' }}>
+                      {commentLoading ? (
+                        <p style={{ fontSize: '0.75rem', color: 'var(--muted)', textAlign: 'center' }}>Loading…</p>
+                      ) : (
+                        <>
+                          {comments.length === 0 && <p style={{ fontSize: '0.75rem', color: 'var(--muted)', marginBottom: '0.5rem' }}>No comments yet.</p>}
+                          {comments.map(c => (
+                            <div key={c.id} style={{ marginBottom: '0.5rem' }}>
+                              <span style={{ fontSize: '0.7rem', fontWeight: 600 }}>{c.display_name}</span>
+                              <span style={{ fontSize: '0.7rem', color: 'var(--muted)', marginLeft: '0.4rem' }}>{new Date(c.created_at).toLocaleDateString()}</span>
+                              <p style={{ margin: '2px 0 0', fontSize: '0.8rem' }}>{c.comment}</p>
+                            </div>
+                          ))}
+                          <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.5rem' }}>
+                            <input
+                              value={commentText}
+                              onChange={e => setCommentText(e.target.value)}
+                              onKeyDown={e => { if (e.key === 'Enter') void postComment(); }}
+                              placeholder="Add a comment…"
+                              style={{ flex: 1, fontSize: '0.8rem', padding: '0.3rem 0.6rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: 'var(--background)', color: 'var(--foreground)', outline: 'none' }}
+                            />
+                            <button
+                              onClick={() => void postComment()}
+                              disabled={commentPosting || !commentText.trim()}
+                              style={{ background: 'var(--accent)', color: 'var(--accent-foreground)', border: 'none', borderRadius: '0.5rem', padding: '0.3rem 0.6rem', fontSize: '0.8rem', cursor: 'pointer', opacity: (commentPosting || !commentText.trim()) ? 0.5 : 1 }}
+                            >
+                              {commentPosting ? '…' : 'Post'}
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
                   </div>
                 );
               })}
@@ -495,6 +617,26 @@ export default function TripDetailPage() {
           onClose={() => { setShowExpenseForm(false); setEditingExpense(undefined); }}
           onSaved={onExpenseSaved}
         />
+      )}
+
+      {/* Invite link modal */}
+      {showInviteModal && inviteLink && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" onClick={() => setShowInviteModal(false)}>
+          <div className="w-full max-w-sm rounded-2xl border border-border bg-surface p-6" onClick={e => e.stopPropagation()}>
+            <h3 className="font-semibold text-lg mb-2">Invite Members</h3>
+            <p className="text-sm text-muted mb-3">Anyone with this link can join the trip. Expires in 7 days.</p>
+            <div className="flex gap-2">
+              <input readOnly value={inviteLink} className="flex-1 rounded-xl border border-border bg-background px-3 py-2 text-sm text-muted" />
+              <button
+                onClick={() => { void navigator.clipboard.writeText(inviteLink); showToast('Link copied! ✓'); setShowInviteModal(false); }}
+                className="rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground"
+              >
+                Copy
+              </button>
+            </div>
+            <button onClick={() => setShowInviteModal(false)} className="mt-4 w-full rounded-xl border border-border py-2 text-sm text-muted">Close</button>
+          </div>
+        </div>
       )}
 
       {/* Toast */}

@@ -9,7 +9,7 @@ export type AuthFormState = { error?: string; message?: string };
 function getSiteURL(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return "http://localhost:3000";
+  return "https://expense-splitter-two-flax.vercel.app";
 }
 
 export async function signUp(

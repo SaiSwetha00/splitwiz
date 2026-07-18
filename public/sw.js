@@ -130,13 +130,35 @@ async function notifySync() {
 // ── Push Notifications ────────────────────────────────────────────────────────
 self.addEventListener('push', (event) => {
   if (!event.data) return;
-  let data = { title: 'SplitWiz', body: '' };
-  try { data = event.data.json(); } catch { /* raw text */ }
+  let data = { title: 'SplitWiz', body: '', url: '/dashboard', icon: '/icon-192x192.png' };
+  try { data = { ...data, ...event.data.json() }; } catch { /* raw text */ }
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: '/icon.svg',
-      badge: '/icon.svg',
+      icon: data.icon,
+      badge: '/badge-72x72.png',
+      data: { url: data.url },
+      actions: [
+        { action: 'open', title: 'Open SplitWiz' },
+        { action: 'dismiss', title: 'Dismiss' },
+      ],
+    })
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  if (event.action === 'dismiss') return;
+  const url = event.notification.data?.url ?? '/dashboard';
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      for (const client of list) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.navigate(url);
+          return client.focus();
+        }
+      }
+      return clients.openWindow(url);
     })
   );
 });

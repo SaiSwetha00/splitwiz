@@ -5,6 +5,13 @@ import { syncQueue } from "@/lib/offline-queue";
 
 export function ServiceWorkerRegistration() {
   useEffect(() => {
+    // Track login count for push permission prompt (show after 3rd login)
+    const key = 'splitwiz_login_count';
+    const count = parseInt(localStorage.getItem(key) ?? '0', 10);
+    localStorage.setItem(key, String(count + 1));
+  }, []);
+
+  useEffect(() => {
     if (!("serviceWorker" in navigator)) return;
 
     const register = async () => {

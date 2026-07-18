@@ -55,6 +55,8 @@ export function TripExpenseForm({ tripId, tripType, currency, members, expense, 
   const [detectedCategory, setDetectedCategory] = useState('');
   const [suggestedCategory, setSuggestedCategory] = useState<{ key: string; icon: string } | null>(null);
   const [scannedItems, setScannedItems] = useState<{ name: string; price: number }[]>([]);
+  const [splitSuggestion, setSplitSuggestion] = useState<{ label: string; memberIds: string[] } | null>(null);
+  const [recurringHint, setRecurringHint] = useState<{ anomaly?: boolean; id?: string } | null>(null);
 
   const suggestions = TRIP_SUGGESTIONS[tripType ?? ''] ?? [];
 
@@ -66,6 +68,25 @@ export function TripExpenseForm({ tripId, tripType, currency, members, expense, 
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
+
+  // Auto-split suggestion from localStorage pattern
+  useEffect(() => {
+    if (!category || editing) return;
+    const key = `splitwiz_split_pref_${tripId}_${category}`;
+    const raw = localStorage.getItem(key);
+    if (!raw) return;
+    try {
+      const pref = JSON.parse(raw) as { memberIds: string[]; count: number };
+      if (pref.count >= 3 && pref.memberIds.length > 0) {
+        const names = pref.memberIds
+          .map(mid => members.find(m => m.id === mid)?.name ?? null)
+          .filter(Boolean)
+          .join(', ');
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- reads localStorage once on category change; no cascading renders
+        setSplitSuggestion({ label: `Use saved split with ${names}?`, memberIds: pref.memberIds });
+      }
+    } catch { /* ignore */ }
+  }, [category, tripId, editing, members]);
 
   // Auto-detect category from title (300ms debounce)
   useEffect(() => {
@@ -199,6 +220,33 @@ export function TripExpenseForm({ tripId, tripType, currency, members, expense, 
       });
       const data = await res.json() as { id?: string; anomaly?: boolean; error?: string };
       if (!res.ok) throw new Error(data.error ?? 'Failed to save expense');
+
+      // Record split pattern for auto-suggestions
+      if (!editing && finalCategory) {
+        const prefKey = `splitwiz_split_pref_${tripId}_${finalCategory}`;
+        const raw = localStorage.getItem(prefKey);
+        const existing = raw ? JSON.parse(raw) as { memberIds: string[]; count: number } : { memberIds: computedSplits.map(s => s.member_id), count: 0 };
+        localStorage.setItem(prefKey, JSON.stringify({ memberIds: computedSplits.map(s => s.member_id), count: existing.count + 1 }));
+      }
+
+      // Record title for recurring detection
+      if (!editing && title.trim()) {
+        const titleKey = `splitwiz_expense_months_${tripId}`;
+        const raw = localStorage.getItem(titleKey);
+        const map: Record<string, string[]> = raw ? JSON.parse(raw) as Record<string, string[]> : {};
+        const titleLower = title.trim().toLowerCase();
+        const monthStr = date.slice(0, 7); // YYYY-MM
+        const months = map[titleLower] ?? [];
+        if (!months.includes(monthStr)) months.push(monthStr);
+        map[titleLower] = months;
+        localStorage.setItem(titleKey, JSON.stringify(map));
+        if (months.length >= 2) {
+          setRecurringHint({ anomaly: data.anomaly, id: data.id });
+          setSaving(false);
+          return;
+        }
+      }
+
       onSaved(data.anomaly, editing, data.id);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong');
@@ -209,7 +257,7 @@ export function TripExpenseForm({ tripId, tripType, currency, members, expense, 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center">
       <div
-        className="max-h-[95vh] w-full max-w-lg overflow-y-auto rounded-t-3xl border border-border bg-surface sm:rounded-3xl"
+        className="relative max-h-[95vh] w-full max-w-lg overflow-y-auto rounded-t-3xl border border-border bg-surface sm:rounded-3xl"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -490,6 +538,55 @@ export function TripExpenseForm({ tripId, tripType, currency, members, expense, 
             ) : editing ? 'Save Changes' : 'Add Expense'}
           </button>
         </div>
+
+        {/* Split suggestion banner */}
+        {splitSuggestion && !editing && (
+          <div style={{ margin: '0 1.25rem 1rem', padding: '0.75rem 1rem', borderRadius: '0.875rem', border: '1px solid var(--accent)', background: 'color-mix(in srgb, var(--accent) 8%, transparent)', display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.8rem' }}>
+            <span style={{ fontSize: '1.1rem' }}>💡</span>
+            <span style={{ flex: 1 }}>{splitSuggestion.label}</span>
+            <button
+              type="button"
+              onClick={() => { setSelectedMembers(new Set(splitSuggestion.memberIds)); setSplitSuggestion(null); }}
+              style={{ background: 'var(--accent)', color: 'var(--accent-foreground)', border: 'none', borderRadius: '0.5rem', padding: '0.3rem 0.7rem', cursor: 'pointer', fontWeight: 600 }}
+            >Yes</button>
+            <button type="button" onClick={() => setSplitSuggestion(null)} style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer' }}>✕</button>
+          </div>
+        )}
+
+        {/* Recurring hint overlay */}
+        {recurringHint && (
+          <div style={{ position: 'absolute', inset: 0, zIndex: 20, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', borderRadius: 'inherit' }}>
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '1.25rem', padding: '1.5rem', maxWidth: '22rem', width: '100%', textAlign: 'center' }}>
+              <p style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🔄</p>
+              <p style={{ fontWeight: 700, marginBottom: '0.25rem' }}>Make it recurring?</p>
+              <p style={{ fontSize: '0.85rem', color: 'var(--muted)', marginBottom: '1.25rem' }}>
+                &ldquo;{title}&rdquo; was added in multiple months — auto-add it monthly?
+              </p>
+              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                <button
+                  onClick={() => {
+                    // Create recurring entry
+                    void fetch(`/api/subscriptions`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ name: title, amount_cents: Math.round(Number(amount) * 100), frequency: 'monthly', active: true, next_billing_date: date }),
+                    });
+                    onSaved(recurringHint.anomaly, editing, recurringHint.id);
+                  }}
+                  style={{ background: 'var(--accent)', color: 'var(--accent-foreground)', border: 'none', borderRadius: '0.875rem', padding: '0.65rem 1.25rem', fontWeight: 700, cursor: 'pointer', fontSize: '0.875rem' }}
+                >
+                  Yes, automate
+                </button>
+                <button
+                  onClick={() => onSaved(recurringHint.anomaly, editing, recurringHint.id)}
+                  style={{ background: 'none', border: '1px solid var(--border)', borderRadius: '0.875rem', padding: '0.65rem 1.25rem', cursor: 'pointer', fontSize: '0.875rem', color: 'var(--muted)' }}
+                >
+                  No thanks
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

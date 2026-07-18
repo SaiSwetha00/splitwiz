@@ -10,15 +10,97 @@ type NotifyParams = {
   actionUrl?: string;
 };
 
+const EMAIL_TYPES = new Set([
+  "expense_added",
+  "settlement_reminder",
+  "budget_warning",
+  "budget_exceeded",
+  "weekly_summary",
+]);
+
+async function sendEmailForNotification(
+  admin: AdminClient,
+  notificationId: string,
+  userId: string,
+  type: string,
+  body: string | undefined,
+): Promise<void> {
+  try {
+    const { data: authUser } = await admin.auth.admin.getUserById(userId);
+    const email = authUser?.user?.email;
+    if (!email) return;
+
+    const appUrl =
+      process.env.NEXT_PUBLIC_SITE_URL?.includes("localhost")
+        ? "https://expense-splitter-two-flax.vercel.app"
+        : (process.env.NEXT_PUBLIC_SITE_URL ?? "https://expense-splitter-two-flax.vercel.app");
+
+    let subject = "SplitWiz Notification";
+    const emailType = type;
+    const data: Record<string, unknown> = {};
+
+    if (type === "weekly_summary") {
+      subject = "Your SplitWiz week in review 📊";
+      const match = body?.match(/₹([\d.]+).*?(\d+)\s+categor/);
+      data.totalSpent = match ? parseFloat(match[1]) : 0;
+      data.categories = match ? parseInt(match[2]) : 0;
+      data.unsettledCount = 0;
+    } else if (type.startsWith("budget_")) {
+      subject = `⚠️ Budget Alert`;
+      const pctMatch = body?.match(/(\d+)%/);
+      const remainMatch = body?.match(/₹([\d.]+)\s+remaining/);
+      data.budgetName = body?.split(" budget")[0] ?? "Budget";
+      data.percent = pctMatch ? parseInt(pctMatch[1]) : 80;
+      data.remaining = remainMatch ? parseFloat(remainMatch[1]) : 0;
+      data.actionUrl = "/dashboard/budgets";
+    } else {
+      return; // other types handled inline
+    }
+
+    await fetch(`${appUrl}/api/email/send`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ to: email, subject, type: emailType, data, notificationId }),
+    });
+  } catch {
+    // Email sending is non-critical — never throw
+  }
+}
+
+async function sendPushNotification(userId: string, title: string, body: string, actionUrl?: string): Promise<void> {
+  try {
+    const appUrl =
+      process.env.NEXT_PUBLIC_SITE_URL?.includes("localhost")
+        ? "https://expense-splitter-two-flax.vercel.app"
+        : (process.env.NEXT_PUBLIC_SITE_URL ?? "https://expense-splitter-two-flax.vercel.app");
+
+    await fetch(`${appUrl}/api/push/send`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, title, body, url: actionUrl ?? "/dashboard" }),
+    });
+  } catch {
+    // Push sending is non-critical — never throw
+  }
+}
+
 export async function createNotification(params: NotifyParams): Promise<void> {
   const admin = createAdminClient();
-  await admin.from("notifications").insert({
+  const { data: row } = await admin.from("notifications").insert({
     user_id: params.userId,
     type: params.type,
     title: params.title,
     body: params.body ?? null,
     action_url: params.actionUrl ?? null,
-  });
+  }).select("id").single();
+
+  // Send email for relevant types
+  if (row?.id && EMAIL_TYPES.has(params.type.replace(/_[0-9a-f-]{36}$/, ""))) {
+    void sendEmailForNotification(admin, row.id as string, params.userId, params.type, params.body);
+  }
+
+  // Send push notification for all types
+  void sendPushNotification(params.userId, params.title, params.body ?? "", params.actionUrl);
 }
 
 type CollabNotifyParams = {
