@@ -329,6 +329,7 @@ export function Sidebar({ displayName }: SidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- closing the mobile menu on route change is a legitimate sync-to-external-navigation effect
     setMobileOpen(false);
   }, [pathname]);
 
