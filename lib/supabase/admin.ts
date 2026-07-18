@@ -1,17 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
-import type { Database } from "./database.types";
-
-// Service-role client — bypasses RLS. Server-side only.
-// Never import this in client components or expose to the browser.
-export function createAdminClient() {
-  return createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    }
-  );
-}
+// Re-exported so there's a single implementation of the service-role
+// client (previously duplicated here and in server.ts with slightly
+// different options). Import from either path — both point here.
+export { createAdminClient } from "./server";

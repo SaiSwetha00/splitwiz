@@ -72,7 +72,7 @@ export async function GET() {
       .order("created_at", { ascending: true }),
     admin
       .from("budgets")
-      .select("id, name, amount_cents, category_id")
+      .select("id, name, amount_cents, category_id, period, start_date, end_date")
       .eq("user_id", user.id),
   ]);
 
@@ -124,12 +124,24 @@ export async function GET() {
     .sort((a, b) => b.total - a.total)
     .slice(0, 5);
 
-  // Budget utilization
+  // Budget utilization — "spent" must be scoped to the budget's own
+  // period (and end_date, if the budget has one), not a lifetime total.
+  // Previously this summed every expense ever recorded, so a "monthly"
+  // budget's spend never reset and a category-less budget counted
+  // spending from every trip going back to account creation.
+  const now = new Date();
   const budgetUtilization = budgets.map((b) => {
     const categoryName = b.category_id ? (catNameMap.get(b.category_id) ?? null) : null;
+    const { windowStart, windowEnd } = getBudgetWindow(b.period, b.start_date, b.end_date, now);
+    const inWindow = allExpenses.filter((e) => {
+      const created = new Date(e.created_at);
+      return created >= windowStart && created < windowEnd;
+    });
     const spent = categoryName
-      ? (catMap.get(categoryName)?.total ?? 0)
-      : allExpenses.reduce((s, e) => s + e.amount_cents, 0);
+      ? inWindow
+          .filter((e) => (e.category ?? "Uncategorized") === categoryName)
+          .reduce((s, e) => s + e.amount_cents, 0)
+      : inWindow.reduce((s, e) => s + e.amount_cents, 0);
     return {
       id: b.id,
       name: b.name,
@@ -152,6 +164,45 @@ export async function GET() {
     expenseCount: allExpenses.length,
     otherCurrencies,
   });
+}
+
+// Returns the [start, end) window that counts as "current period" for a
+// budget's spend, anchored to the budget's start_date. end_date, if set,
+// caps the window (a budget that has already ended stops accruing spend).
+function getBudgetWindow(
+  period: string,
+  startDateStr: string,
+  endDateStr: string | null,
+  now: Date
+): { windowStart: Date; windowEnd: Date } {
+  const budgetStart = new Date(startDateStr);
+  let periodStart: Date;
+
+  switch (period) {
+    case "daily":
+      periodStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      break;
+    case "weekly": {
+      const dayOfWeek = now.getDay(); // 0 = Sunday
+      const diffToMonday = (dayOfWeek + 6) % 7;
+      periodStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - diffToMonday);
+      break;
+    }
+    case "yearly":
+      periodStart = new Date(now.getFullYear(), 0, 1);
+      break;
+    case "monthly":
+    default:
+      periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      break;
+  }
+
+  // The budget can't have accrued spend before it existed.
+  const windowStart = periodStart > budgetStart ? periodStart : budgetStart;
+  const hardEnd = endDateStr ? new Date(endDateStr) : null;
+  const windowEnd = hardEnd && hardEnd < now ? hardEnd : new Date(now.getTime() + 1);
+
+  return { windowStart, windowEnd };
 }
 
 function buildEmptyMonths() {

@@ -20,8 +20,9 @@ export async function createClient() {
               cookieStore.set(name, value, options)
             );
           } catch {
-            // Called from a Server Component — safe to ignore until
-            // middleware is added in Phase 3.
+            // Called from a Server Component, which can't set cookies.
+            // proxy.ts (Next.js middleware) already refreshes the session
+            // on every request, so it's safe to ignore here.
           }
         },
       },
@@ -29,12 +30,14 @@ export async function createClient() {
   );
 }
 
-// Service-role client — bypasses RLS. Use only in server-side API routes
-// after verifying auth with createClient().
+// Service-role client — bypasses RLS. Server-side only. Use only in API
+// routes / server code after verifying auth (or for trusted writes gated
+// by a manual permission check such as checkTripWrite()). Never import
+// this into a "use client" component or otherwise expose it to the browser.
 export function createAdminClient() {
   return createSupabaseClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false } }
+    { auth: { autoRefreshToken: false, persistSession: false } }
   );
 }

@@ -7,6 +7,7 @@ export function ThemeToggle({ initialTheme }: { initialTheme: string }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reads DOM/matchMedia state that only exists client-side, needed to avoid an SSR/CSR theme mismatch
     setMounted(true);
     const t = document.documentElement.dataset.theme;
     if (t === "dark") setDark(true);

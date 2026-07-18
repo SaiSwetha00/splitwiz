@@ -701,6 +701,7 @@ function AccessTab({ trip }: { trip: TripState }) {
   }, [trip.code]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch-on-mount is a blessed effect use case (react.dev/learn/you-might-not-need-an-effect#fetching-data)
     fetchCollabs();
   }, [fetchCollabs]);
 

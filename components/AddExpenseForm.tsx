@@ -65,6 +65,7 @@ export default function AddExpenseForm({
 
   useEffect(() => {
     if (description.trim().length < 3) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- clearing a stale AI suggestion when its input becomes invalid is a legitimate sync effect
       setSuggestedCategory(null);
       return;
     }

@@ -82,6 +82,7 @@ export function NotificationBell() {
   }
 
   function timeAgo(iso: string): string {
+    // eslint-disable-next-line react-hooks/purity -- only rendered client-side after notifications have loaded, no SSR/hydration mismatch
     const diff = Date.now() - new Date(iso).getTime();
     const mins = Math.floor(diff / 60_000);
     if (mins < 1) return "just now";

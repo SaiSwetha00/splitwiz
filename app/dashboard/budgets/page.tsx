@@ -26,9 +26,12 @@ function todayStr() {
   return new Date().toISOString().slice(0, 10);
 }
 
+type BudgetUtilization = { id: string; spent: number };
+
 export default function BudgetsPage() {
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [spentById, setSpentById] = useState<Map<string, number>>(new Map());
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState("");
 
@@ -50,10 +53,13 @@ export default function BudgetsPage() {
     Promise.all([
       fetch("/api/budgets").then((r) => r.json()),
       fetch("/api/categories").then((r) => r.json()),
+      fetch("/api/analytics").then((r) => r.json()),
     ])
-      .then(([bd, cd]) => {
+      .then(([bd, cd, ad]) => {
         setBudgets(bd.budgets ?? []);
         setCategories(cd.categories ?? []);
+        const utilization: BudgetUtilization[] = ad.budgetUtilization ?? [];
+        setSpentById(new Map(utilization.map((u) => [u.id, u.spent])));
       })
       .catch(() => setFetchError("Failed to load data. Please refresh."))
       .finally(() => setLoading(false));
@@ -282,65 +288,104 @@ export default function BudgetsPage() {
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          {budgets.map((b) => (
-            <div
-              key={b.id}
-              className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-surface px-5 py-4"
-            >
-              <div className="flex min-w-0 flex-1 flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  {b.category?.icon && <span className="text-lg">{b.category.icon}</span>}
-                  <span className="font-medium">{b.name}</span>
-                </div>
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted">
-                  <span className="font-semibold text-foreground">
-                    $
-                    {fromCents(b.amount_cents).toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </span>
-                  <span>·</span>
-                  <span>{b.period}</span>
-                  {b.category && (
-                    <>
-                      <span>·</span>
-                      <span>{b.category.name}</span>
-                    </>
-                  )}
-                  <span>·</span>
-                  <span>
-                    From{" "}
-                    {new Date(b.start_date).toLocaleDateString(undefined, {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                    {b.end_date &&
-                      ` — ${new Date(b.end_date).toLocaleDateString(undefined, {
+          {budgets.map((b) => {
+            const spent = spentById.get(b.id) ?? 0;
+            const pct = b.amount_cents > 0 ? Math.min(100, (spent / b.amount_cents) * 100) : 0;
+            const over = spent > b.amount_cents;
+            const barColor = over
+              ? "bg-negative"
+              : pct >= 80
+                ? "bg-amber-500"
+                : "bg-accent";
+            return (
+              <div
+                key={b.id}
+                className="flex flex-col gap-3 rounded-2xl border border-border bg-surface px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                  <div className="flex items-center gap-2">
+                    {b.category?.icon && <span className="text-lg">{b.category.icon}</span>}
+                    <span className="font-medium">{b.name}</span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted">
+                    <span className={`font-semibold ${over ? "text-negative" : "text-foreground"}`}>
+                      $
+                      {fromCents(spent).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                    <span>
+                      of $
+                      {fromCents(b.amount_cents).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                    <span>·</span>
+                    <span>{b.period}</span>
+                    {b.category && (
+                      <>
+                        <span>·</span>
+                        <span>{b.category.name}</span>
+                      </>
+                    )}
+                    <span>·</span>
+                    <span>
+                      From{" "}
+                      {new Date(b.start_date).toLocaleDateString(undefined, {
                         month: "short",
                         day: "numeric",
                         year: "numeric",
-                      })}`}
-                  </span>
+                      })}
+                      {b.end_date &&
+                        ` — ${new Date(b.end_date).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}`}
+                    </span>
+                  </div>
+                  <div
+                    className="h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-background"
+                    role="progressbar"
+                    aria-valuenow={Math.round(pct)}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`${b.name} budget usage`}
+                  >
+                    <div
+                      className={`h-full rounded-full transition-all ${barColor}`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  {over && (
+                    <p className="text-xs font-medium text-negative">
+                      Over budget by $
+                      {fromCents(spent - b.amount_cents).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </p>
+                  )}
+                </div>
+                <div className="flex shrink-0 gap-1">
+                  <button
+                    onClick={() => openEdit(b)}
+                    className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted hover:text-foreground"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(b.id)}
+                    className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-negative hover:border-negative/30"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
-              <div className="flex shrink-0 gap-1">
-                <button
-                  onClick={() => openEdit(b)}
-                  className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted hover:text-foreground"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(b.id)}
-                  className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-negative hover:border-negative/30"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
