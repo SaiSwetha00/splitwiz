@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 type Notification = {
   id: string;
@@ -33,6 +34,46 @@ export function NotificationBell() {
         }
       })
       .catch(() => {});
+  }, []);
+
+  // Realtime: update badge when new notification arrives.
+  useEffect(() => {
+    const supabase = createClient();
+    let cancelled = false;
+
+    supabase.auth.getUser().then(({ data }) => {
+      if (cancelled) return;
+      const userId = data.user?.id;
+      if (!userId) return;
+
+      // Request browser notification permission on first visit
+      if ('Notification' in window && Notification.permission === 'default') {
+        void Notification.requestPermission();
+      }
+
+      const channel = supabase
+        .channel('notif-bell-realtime')
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${userId}` },
+          (payload) => {
+            setUnreadCount((prev) => prev + 1);
+            setNotifications((prev) => {
+              const n = payload.new as { id: string; type: string; title: string; body: string | null; action_url: string | null; read: boolean; created_at: string };
+              return [n, ...prev];
+            });
+            if ('Notification' in window && Notification.permission === 'granted') {
+              const n = payload.new as { title?: string; body?: string };
+              void new Notification(n.title ?? 'SplitWiz', { body: n.body ?? '' });
+            }
+          }
+        )
+        .subscribe();
+
+      return () => { void supabase.removeChannel(channel); };
+    });
+
+    return () => { cancelled = true; };
   }, []);
 
   const fetchNotifications = useCallback(async () => {

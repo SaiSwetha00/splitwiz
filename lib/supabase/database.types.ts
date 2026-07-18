@@ -21,14 +21,25 @@ export interface Database {
           currency: string;
           created_at: string;
           user_id: string | null;
+          // Phase 1 additions
+          type: string | null;
+          description: string | null;
+          status: string;
+          total_spent: number;
+          updated_at: string;
         };
         Insert: {
           id?: string;
-          code: string;
+          code?: string;
           name: string;
           currency?: string;
           created_at?: string;
           user_id?: string | null;
+          type?: string | null;
+          description?: string | null;
+          status?: string;
+          total_spent?: number;
+          updated_at?: string;
         };
         Update: {
           id?: string;
@@ -37,6 +48,11 @@ export interface Database {
           currency?: string;
           created_at?: string;
           user_id?: string | null;
+          type?: string | null;
+          description?: string | null;
+          status?: string;
+          total_spent?: number;
+          updated_at?: string;
         };
         Relationships: [];
       };
@@ -80,17 +96,36 @@ export interface Database {
           category_id: string | null;
           split_type: string;
           created_at: string;
+          // Phase 1 additions
+          title: string | null;
+          amount: number | null;
+          currency: string | null;
+          category_icon: string | null;
+          paid_by_member_id: string | null;
+          note: string | null;
+          receipt_url: string | null;
+          created_by: string | null;
+          date: string;
         };
         Insert: {
           id?: string;
           trip_id: string;
-          paid_by_id: string;
-          description: string;
-          amount_cents: number;
+          paid_by_id?: string;
+          description?: string;
+          amount_cents?: number;
           category?: string | null;
           category_id?: string | null;
           split_type?: string;
           created_at?: string;
+          title?: string | null;
+          amount?: number | null;
+          currency?: string | null;
+          category_icon?: string | null;
+          paid_by_member_id?: string | null;
+          note?: string | null;
+          receipt_url?: string | null;
+          created_by?: string | null;
+          date?: string;
         };
         Update: {
           id?: string;
@@ -102,6 +137,15 @@ export interface Database {
           category_id?: string | null;
           split_type?: string;
           created_at?: string;
+          title?: string | null;
+          amount?: number | null;
+          currency?: string | null;
+          category_icon?: string | null;
+          paid_by_member_id?: string | null;
+          note?: string | null;
+          receipt_url?: string | null;
+          created_by?: string | null;
+          date?: string;
         };
         Relationships: [
           {
@@ -401,6 +445,9 @@ export interface Database {
           body: string | null;
           action_url: string | null;
           read: boolean;
+          message: string | null;
+          link: string | null;
+          is_read: boolean;
           created_at: string;
         };
         Insert: {
@@ -411,6 +458,9 @@ export interface Database {
           body?: string | null;
           action_url?: string | null;
           read?: boolean;
+          message?: string | null;
+          link?: string | null;
+          is_read?: boolean;
           created_at?: string;
         };
         Update: {
@@ -421,6 +471,9 @@ export interface Database {
           body?: string | null;
           action_url?: string | null;
           read?: boolean;
+          message?: string | null;
+          link?: string | null;
+          is_read?: boolean;
           created_at?: string;
         };
         Relationships: [];
@@ -654,6 +707,214 @@ export interface Database {
           },
         ];
       };
+      // ── Phase 1 new tables ───────────────────────────────────
+      trip_members: {
+        Row: {
+          id: string;
+          trip_id: string;
+          user_id: string | null;
+          name: string;
+          email: string | null;
+          avatar_color: string;
+          is_creator: boolean;
+          joined_at: string;
+        };
+        Insert: {
+          id?: string;
+          trip_id: string;
+          user_id?: string | null;
+          name: string;
+          email?: string | null;
+          avatar_color?: string;
+          is_creator?: boolean;
+          joined_at?: string;
+        };
+        Update: {
+          id?: string;
+          trip_id?: string;
+          user_id?: string | null;
+          name?: string;
+          email?: string | null;
+          avatar_color?: string;
+          is_creator?: boolean;
+          joined_at?: string;
+        };
+        Relationships: [];
+      };
+      expense_splits: {
+        Row: {
+          id: string;
+          expense_id: string;
+          member_id: string;
+          amount: number;
+          is_settled: boolean;
+          settled_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          expense_id: string;
+          member_id: string;
+          amount: number;
+          is_settled?: boolean;
+          settled_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          expense_id?: string;
+          member_id?: string;
+          amount?: number;
+          is_settled?: boolean;
+          settled_at?: string | null;
+        };
+        Relationships: [];
+      };
+      settlements: {
+        Row: {
+          id: string;
+          trip_id: string;
+          from_member_id: string;
+          to_member_id: string;
+          amount: number;
+          method: string;
+          note: string | null;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          trip_id: string;
+          from_member_id: string;
+          to_member_id: string;
+          amount: number;
+          method?: string;
+          note?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          trip_id?: string;
+          from_member_id?: string;
+          to_member_id?: string;
+          amount?: number;
+          method?: string;
+          note?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      activity_log: {
+        Row: {
+          id: string;
+          trip_id: string | null;
+          user_id: string;
+          action_type: string;
+          description: string;
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          trip_id?: string | null;
+          user_id: string;
+          action_type: string;
+          description: string;
+          metadata?: Json;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          trip_id?: string | null;
+          user_id?: string;
+          action_type?: string;
+          description?: string;
+          metadata?: Json;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      payment_cards: {
+        Row: {
+          id: string;
+          user_id: string;
+          card_type: string | null;
+          last_4_digits: string | null;
+          card_holder_name: string;
+          bank_name: string | null;
+          card_color: string;
+          is_default: boolean;
+          upi_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          card_type?: string | null;
+          last_4_digits?: string | null;
+          card_holder_name: string;
+          bank_name?: string | null;
+          card_color?: string;
+          is_default?: boolean;
+          upi_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          card_type?: string | null;
+          last_4_digits?: string | null;
+          card_holder_name?: string;
+          bank_name?: string | null;
+          card_color?: string;
+          is_default?: boolean;
+          upi_id?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      transactions: {
+        Row: {
+          id: string;
+          user_id: string;
+          type: string;
+          amount: number;
+          currency: string;
+          description: string | null;
+          payment_card_id: string | null;
+          related_expense_id: string | null;
+          related_settlement_id: string | null;
+          status: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          type: string;
+          amount: number;
+          currency?: string;
+          description?: string | null;
+          payment_card_id?: string | null;
+          related_expense_id?: string | null;
+          related_settlement_id?: string | null;
+          status?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          type?: string;
+          amount?: number;
+          currency?: string;
+          description?: string | null;
+          payment_card_id?: string | null;
+          related_expense_id?: string | null;
+          related_settlement_id?: string | null;
+          status?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       trip_collaborators: {
         Row: {
           id: string;
@@ -695,6 +956,14 @@ export interface Database {
       lookup_user_by_email: {
         Args: { p_email: string };
         Returns: string | null;
+      };
+      calculate_balances: {
+        Args: { p_trip_id: string };
+        Returns: { member_id: string; net_balance: number }[];
+      };
+      simplify_debts: {
+        Args: { p_trip_id: string };
+        Returns: { from_member_id: string; to_member_id: string; amount: number }[];
       };
       update_expense_with_shares: {
         Args: {

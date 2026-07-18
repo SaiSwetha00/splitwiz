@@ -18,3 +18,19 @@ export async function PATCH(_request: Request, { params }: RouteParams) {
 
   return NextResponse.json({ ok: true });
 }
+
+// DELETE /api/notifications/:id — delete a single notification.
+export async function DELETE(_request: Request, { params }: RouteParams) {
+  const { id } = await params;
+  const auth = await requireAuth();
+  if (!auth.ok) return auth.response;
+  const { user, admin } = auth;
+
+  await admin
+    .from("notifications")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", user.id);
+
+  return NextResponse.json({ ok: true });
+}

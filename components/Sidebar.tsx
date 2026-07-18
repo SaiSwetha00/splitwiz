@@ -10,6 +10,7 @@ interface NavItem {
   label: string;
   icon: React.ReactNode;
   exact?: boolean;
+  badge?: string;
 }
 
 const NAV_MAIN: NavItem[] = [
@@ -25,6 +26,17 @@ const NAV_MAIN: NavItem[] = [
     ),
   },
   {
+    href: "/dashboard/trips",
+    label: "Trips",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="2" y1="12" x2="22" y2="12" />
+        <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
+      </svg>
+    ),
+  },
+  {
     href: "/dashboard/analytics",
     label: "Analytics",
     icon: (
@@ -33,6 +45,43 @@ const NAV_MAIN: NavItem[] = [
         <line x1="12" y1="20" x2="12" y2="4" />
         <line x1="6" y1="20" x2="6" y2="14" />
         <line x1="2" y1="20" x2="22" y2="20" />
+      </svg>
+    ),
+  },
+  {
+    href: "/dashboard/reports",
+    label: "Reports",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="16" y1="13" x2="8" y2="13" />
+        <line x1="16" y1="17" x2="8" y2="17" />
+        <polyline points="10 9 9 9 8 9" />
+      </svg>
+    ),
+  },
+  {
+    href: "/dashboard/cards",
+    label: "Cards",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+        <line x1="1" y1="10" x2="23" y2="10" />
+      </svg>
+    ),
+  },
+  {
+    href: "/dashboard/transactions",
+    label: "Transactions",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="8" y1="6" x2="21" y2="6" />
+        <line x1="8" y1="12" x2="21" y2="12" />
+        <line x1="8" y1="18" x2="21" y2="18" />
+        <line x1="3" y1="6" x2="3.01" y2="6" />
+        <line x1="3" y1="12" x2="3.01" y2="12" />
+        <line x1="3" y1="18" x2="3.01" y2="18" />
       </svg>
     ),
   },
@@ -67,9 +116,29 @@ const NAV_MAIN: NavItem[] = [
       </svg>
     ),
   },
+  {
+    href: "/dashboard/ai-assistant",
+    label: "AI Assistant",
+    badge: "New",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z" />
+      </svg>
+    ),
+  },
 ];
 
 const NAV_BOTTOM: NavItem[] = [
+  {
+    href: "/dashboard/profile",
+    label: "Profile",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
+      </svg>
+    ),
+  },
   {
     href: "/dashboard/notifications",
     label: "Notifications",
@@ -124,6 +193,11 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
         {item.icon}
       </span>
       {item.label}
+      {item.badge && !active && (
+        <span className="sidebar-badge" style={{ marginLeft: 4 }}>
+          {item.badge}
+        </span>
+      )}
       {active && (
         <span
           style={{
@@ -214,7 +288,7 @@ function SidebarContent({ displayName, onClose }: { displayName: string; onClose
       {/* New Trip CTA */}
       <div style={{ padding: "12px 10px 6px" }}>
         <Link
-          href="/dashboard/trips/new"
+          href="/dashboard/trips"
           style={{
             display: "flex",
             alignItems: "center",
@@ -319,6 +393,20 @@ function SidebarContent({ displayName, onClose }: { displayName: string; onClose
         }
         .sidebar-link:hover span { opacity: 1 !important; }
         .sidebar-new-trip:hover { opacity: 0.88; }
+        .sidebar-badge {
+          font-size: 9px;
+          font-weight: 700;
+          background: var(--accent);
+          color: #fff;
+          padding: 1px 5px;
+          border-radius: 6px;
+          letter-spacing: 0.03em;
+          animation: sbpulse 2s ease-in-out infinite;
+        }
+        @keyframes sbpulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.55; }
+        }
       `}</style>
     </div>
   );

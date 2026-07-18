@@ -34,3 +34,14 @@ export async function PATCH() {
 
   return NextResponse.json({ ok: true });
 }
+
+// DELETE /api/notifications — delete all notifications for the user.
+export async function DELETE() {
+  const auth = await requireAuth();
+  if (!auth.ok) return auth.response;
+  const { user, admin } = auth;
+
+  await admin.from("notifications").delete().eq("user_id", user.id);
+
+  return NextResponse.json({ ok: true });
+}

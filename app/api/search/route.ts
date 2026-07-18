@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
 
   const q = request.nextUrl.searchParams.get("q")?.trim() ?? "";
   if (q.length < 2) {
-    return NextResponse.json({ trips: [], expenses: [] });
+    return NextResponse.json({ trips: [], expenses: [], subscriptions: [], goals: [] });
   }
 
   const admin = createAdminClient();
@@ -26,30 +26,43 @@ export async function GET(request: NextRequest) {
     ]),
   ];
 
-  if (accessibleIds.length === 0) {
-    return NextResponse.json({ trips: [], expenses: [] });
-  }
+  const like = `%${q}%`;
 
-  const [tripsResult, expensesResult] = await Promise.all([
+  const [tripsResult, expensesResult, subsResult, goalsResult] = await Promise.all([
+    accessibleIds.length > 0
+      ? admin
+          .from("trips")
+          .select("id, code, name, currency, created_at")
+          .in("id", accessibleIds)
+          .ilike("name", like)
+          .order("created_at", { ascending: false })
+          .limit(5)
+      : Promise.resolve({ data: [] }),
+    accessibleIds.length > 0
+      ? admin
+          .from("expenses")
+          .select("id, title, description, amount_cents, amount, category, created_at, trip_id")
+          .in("trip_id", accessibleIds)
+          .or(`description.ilike.${like},title.ilike.${like}`)
+          .order("created_at", { ascending: false })
+          .limit(10)
+      : Promise.resolve({ data: [] }),
     admin
-      .from("trips")
-      .select("id, code, name, currency, created_at")
-      .in("id", accessibleIds)
-      .ilike("name", `%${q}%`)
-      .order("created_at", { ascending: false })
+      .from("subscriptions")
+      .select("id, name, amount_cents")
+      .eq("user_id", user.id)
+      .ilike("name", like)
       .limit(5),
     admin
-      .from("expenses")
-      .select("id, description, amount_cents, category, created_at, trip_id")
-      .in("trip_id", accessibleIds)
-      .ilike("description", `%${q}%`)
-      .order("created_at", { ascending: false })
-      .limit(10),
+      .from("savings_goals")
+      .select("id, name, target_cents, current_cents")
+      .eq("user_id", user.id)
+      .ilike("name", like)
+      .limit(5),
   ]);
 
-  const expenseTripIds = [
-    ...new Set((expensesResult.data ?? []).map((e) => e.trip_id)),
-  ];
+  const expenseRows = (expensesResult.data ?? []);
+  const expenseTripIds = [...new Set(expenseRows.map((e) => e.trip_id))];
 
   let tripMap = new Map<string, { code: string; name: string; currency: string }>();
   if (expenseTripIds.length > 0) {
@@ -58,21 +71,23 @@ export async function GET(request: NextRequest) {
       .select("id, code, name, currency")
       .in("id", expenseTripIds);
     tripMap = new Map(
-      (tripRows ?? []).map((t) => [
-        t.id,
-        { code: t.code, name: t.name, currency: t.currency },
-      ])
+      (tripRows ?? []).map((t) => [t.id, { code: t.code, name: t.name, currency: t.currency }])
     );
   }
 
-  const expenses = (expensesResult.data ?? []).map((e) => ({
+  const expenses = expenseRows.map((e) => ({
     id: e.id,
-    description: e.description,
-    amount_cents: e.amount_cents,
-    category: e.category,
-    created_at: e.created_at,
+    title: (e.title ?? e.description ?? '') as string,
+    amount_cents: (e.amount_cents ?? Math.round(Number(e.amount ?? 0) * 100)) as number,
+    category: e.category as string | null,
+    created_at: e.created_at as string,
     trip: tripMap.get(e.trip_id) ?? null,
   }));
 
-  return NextResponse.json({ trips: tripsResult.data ?? [], expenses });
+  return NextResponse.json({
+    trips: tripsResult.data ?? [],
+    expenses,
+    subscriptions: subsResult.data ?? [],
+    goals: goalsResult.data ?? [],
+  });
 }
