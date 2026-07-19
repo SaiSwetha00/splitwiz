@@ -43,8 +43,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Unauthenticated users: redirect away from / and protected routes.
-  if (!user && (pathname === "/" || pathname.startsWith("/dashboard"))) {
+  // Unauthenticated users: redirect away from protected routes.
+  if (!user && pathname.startsWith("/dashboard")) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
