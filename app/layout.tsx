@@ -12,11 +12,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const CANONICAL_URL = "https://expense-splitter-two-flax.vercel.app";
+
 function getAppURL(): string {
   const site = process.env.NEXT_PUBLIC_SITE_URL;
   if (site && !site.includes("localhost")) return site;
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return site ?? "https://expense-splitter-two-flax.vercel.app";
+  return CANONICAL_URL;
 }
 const APP_URL = getAppURL();
 
