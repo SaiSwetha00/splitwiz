@@ -33,7 +33,7 @@ export function TopBar({ displayName, email, theme }: TopBarProps) {
   return (
     <header
       className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-surface px-4"
-      style={{ gap: 12 }}
+      style={{ gap: 12, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}
     >
       {/* Left: hamburger + page title */}
       <div className="flex items-center gap-3 min-w-0">

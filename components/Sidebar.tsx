@@ -259,6 +259,7 @@ function SidebarContent({ displayName, onClose }: { displayName: string; onClose
             fontSize: 15,
             fontWeight: 700,
             letterSpacing: "-0.03em",
+            fontFamily: "'Clash Display', sans-serif",
           }}
         >
           <span style={{ fontSize: 18, lineHeight: 1 }}>💸</span>
@@ -296,12 +297,13 @@ function SidebarContent({ displayName, onClose }: { displayName: string; onClose
             gap: 6,
             padding: "8px 12px",
             borderRadius: 8,
-            background: "var(--accent)",
+            background: "linear-gradient(135deg, #6366f1 0%, #818cf8 100%)",
             color: "#fff",
             fontSize: 13,
             fontWeight: 600,
             textDecoration: "none",
             letterSpacing: "-0.01em",
+            boxShadow: "0 2px 12px rgba(99,102,241,0.35)",
           }}
           className="sidebar-new-trip"
         >

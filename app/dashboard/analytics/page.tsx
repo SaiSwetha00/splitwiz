@@ -305,8 +305,8 @@ function AnalyticsContent() {
                   <AreaChart data={data.timeline} margin={{ top: 10, right: 10, bottom: 0, left: 0 }}>
                     <defs>
                       <linearGradient id="spendGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="#14b8a6" stopOpacity={0.35} />
-                        <stop offset="95%" stopColor="#14b8a6" stopOpacity={0} />
+                        <stop offset="5%"  stopColor="#6366f1" stopOpacity={0.35} />
+                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -340,7 +340,7 @@ function AnalyticsContent() {
                     <Area
                       type="monotone"
                       dataKey="amount"
-                      stroke="#14b8a6"
+                      stroke="#6366f1"
                       strokeWidth={2}
                       fill="url(#spendGrad)"
                       dot={false}
@@ -539,7 +539,7 @@ function AnalyticsContent() {
                     />
                     <Bar dataKey="total" maxBarSize={32} radius={[4, 4, 0, 0]}>
                       {monthlyWithAvg.map((m, i) => (
-                        <Cell key={i} fill={m.key === curKey ? "#6366f1" : "#14b8a6"} />
+                        <Cell key={i} fill={m.key === curKey ? "#6366f1" : "rgba(99,102,241,0.35)"} />
                       ))}
                     </Bar>
                     <Line

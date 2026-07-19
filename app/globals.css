@@ -1,23 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f1f3f7;
-  --surface: #ffffff;
-  --foreground: #0f172a;
-  --muted: #64748b;
-  --border: #e2e8f0;
-  --accent: #4f46e5;
+  /* Premium dark palette — default for all users */
+  --background: #0a0a14;
+  --surface: #111120;
+  --foreground: #ffffff;
+  --muted: #888888;
+  --border: rgba(99, 102, 241, 0.15);
+  --accent: #6366f1;
   --accent-foreground: #ffffff;
-  --positive: #059669;
-  --negative: #dc2626;
+  --positive: #45D881;
+  --negative: #FE1514;
 
-  /* Sidebar — always dark regardless of theme */
-  --sidebar: #13141f;
-  --sidebar-border: rgba(255, 255, 255, 0.07);
+  /* Sidebar */
+  --sidebar: #0d0d1f;
+  --sidebar-border: rgba(99, 102, 241, 0.12);
   --sidebar-fg: rgba(255, 255, 255, 0.42);
   --sidebar-fg-active: #ffffff;
-  --sidebar-active: rgba(99, 102, 241, 0.2);
-  --sidebar-hover: rgba(255, 255, 255, 0.07);
+  --sidebar-active: rgba(99, 102, 241, 0.18);
+  --sidebar-hover: rgba(99, 102, 241, 0.08);
 }
 
 @theme inline {
@@ -34,23 +35,26 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* System dark OS: same premium palette */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #09090f;
-    --surface: #111118;
-    --foreground: #f1f5f9;
-    --muted: #94a3b8;
-    --border: #1e2130;
+    --background: #0a0a14;
+    --surface: #111120;
+    --foreground: #ffffff;
+    --muted: #888888;
+    --border: rgba(99, 102, 241, 0.15);
     --accent: #6366f1;
     --accent-foreground: #ffffff;
-    --positive: #34d399;
-    --negative: #f87171;
-
-    --sidebar: #0a0b13;
+    --positive: #45D881;
+    --negative: #FE1514;
+    --sidebar: #0d0d1f;
+    --sidebar-border: rgba(99, 102, 241, 0.12);
+    --sidebar-active: rgba(99, 102, 241, 0.18);
+    --sidebar-hover: rgba(99, 102, 241, 0.08);
   }
 }
 
-/* Explicit theme overrides (set via data-theme by ThemeApplier) */
+/* Light theme (explicit user preference) */
 :root[data-theme="light"] {
   --background: #f1f3f7;
   --surface: #ffffff;
@@ -61,26 +65,72 @@
   --accent-foreground: #ffffff;
   --positive: #059669;
   --negative: #dc2626;
-
   --sidebar: #13141f;
+  --sidebar-border: rgba(255, 255, 255, 0.07);
+  --sidebar-fg: rgba(255, 255, 255, 0.42);
+  --sidebar-fg-active: #ffffff;
+  --sidebar-active: rgba(99, 102, 241, 0.2);
+  --sidebar-hover: rgba(255, 255, 255, 0.07);
 }
 
+/* Dark theme (explicit user preference) — premium dark */
 :root[data-theme="dark"] {
-  --background: #09090f;
-  --surface: #111118;
-  --foreground: #f1f5f9;
-  --muted: #94a3b8;
-  --border: #1e2130;
+  --background: #0a0a14;
+  --surface: #111120;
+  --foreground: #ffffff;
+  --muted: #888888;
+  --border: rgba(99, 102, 241, 0.15);
   --accent: #6366f1;
   --accent-foreground: #ffffff;
-  --positive: #34d399;
-  --negative: #f87171;
-
-  --sidebar: #0a0b13;
+  --positive: #45D881;
+  --negative: #FE1514;
+  --sidebar: #0d0d1f;
+  --sidebar-border: rgba(99, 102, 241, 0.12);
+  --sidebar-fg: rgba(255, 255, 255, 0.42);
+  --sidebar-fg-active: #ffffff;
+  --sidebar-active: rgba(99, 102, 241, 0.18);
+  --sidebar-hover: rgba(99, 102, 241, 0.08);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: 'DM Sans', var(--font-sans), Arial, Helvetica, sans-serif;
 }
+
+/* Clash Display for all headings */
+h1, h2, h3, h4 {
+  font-family: 'Clash Display', 'DM Sans', var(--font-sans), sans-serif;
+}
+
+/* Input focus: indigo glow */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+}
+
+/* Smooth transitions on interactive elements */
+a, button, input, select, textarea {
+  transition: border-color 0.15s, box-shadow 0.15s, opacity 0.15s, background 0.15s;
+}
+
+/* Primary buttons and links: indigo gradient */
+button.bg-accent,
+a.bg-accent {
+  background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%) !important;
+  box-shadow: 0 2px 14px rgba(99, 102, 241, 0.3);
+}
+:root[data-theme="light"] button.bg-accent,
+:root[data-theme="light"] a.bg-accent {
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
+  box-shadow: 0 2px 14px rgba(79, 70, 229, 0.25);
+}
+
+/* Custom scrollbar — subtle indigo tint */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.25); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.45); }

@@ -6,7 +6,13 @@ import { signUp, type AuthFormState } from "@/lib/auth/actions";
 import { GoogleButton } from "@/components/auth/GoogleButton";
 
 const inputClass =
-  "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent";
+  "w-full rounded-lg border px-3 py-2.5 text-sm outline-none placeholder:opacity-40";
+
+const inputStyle = {
+  background: "rgba(255,255,255,0.04)",
+  borderColor: "rgba(99,102,241,0.2)",
+  color: "#ffffff",
+};
 
 export default function SignupPage() {
   const [state, formAction, isPending] = useActionState<AuthFormState, FormData>(
@@ -17,20 +23,49 @@ export default function SignupPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="text-center">
-        <h1 className="text-2xl font-bold tracking-tight">Create an account</h1>
-        <p className="mt-1 text-sm text-muted">
-          Start splitting expenses with Splitwiz
+        <h1
+          style={{
+            fontFamily: "'Clash Display', sans-serif",
+            fontSize: "1.5rem",
+            fontWeight: 700,
+            color: "#ffffff",
+            letterSpacing: "-0.03em",
+            margin: 0,
+          }}
+        >
+          Create an account
+        </h1>
+        <p style={{ marginTop: 6, fontSize: "0.85rem", color: "#888888" }}>
+          Start splitting expenses with SplitWiz
         </p>
       </div>
 
       {state.error && (
-        <p className="rounded-lg border border-negative/30 bg-negative/10 px-4 py-3 text-sm text-negative">
+        <p
+          style={{
+            borderRadius: 10,
+            border: "1px solid rgba(254,21,20,0.3)",
+            background: "rgba(254,21,20,0.08)",
+            padding: "0.65rem 1rem",
+            fontSize: "0.82rem",
+            color: "#FE1514",
+          }}
+        >
           {state.error}
         </p>
       )}
 
       {state.message && (
-        <p className="rounded-lg border border-positive/30 bg-positive/10 px-4 py-3 text-sm text-positive">
+        <p
+          style={{
+            borderRadius: 10,
+            border: "1px solid rgba(69,216,129,0.3)",
+            background: "rgba(69,216,129,0.08)",
+            padding: "0.65rem 1rem",
+            fontSize: "0.82rem",
+            color: "#45D881",
+          }}
+        >
           {state.message}
         </p>
       )}
@@ -39,15 +74,23 @@ export default function SignupPage() {
         <>
           <GoogleButton label="Sign up with Google" />
 
-          <div className="flex items-center gap-3">
-            <hr className="flex-1 border-border" />
-            <span className="text-xs text-muted">or</span>
-            <hr className="flex-1 border-border" />
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <hr style={{ flex: 1, borderColor: "rgba(99,102,241,0.15)" }} />
+            <span style={{ fontSize: "0.75rem", color: "#888888" }}>or</span>
+            <hr style={{ flex: 1, borderColor: "rgba(99,102,241,0.15)" }} />
           </div>
 
           <form action={formAction} className="flex flex-col gap-4">
             <label className="flex flex-col gap-1.5">
-              <span className="text-xs font-semibold uppercase tracking-wide text-muted">
+              <span
+                style={{
+                  fontSize: "0.7rem",
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                  color: "#888888",
+                }}
+              >
                 Name
               </span>
               <input
@@ -55,12 +98,21 @@ export default function SignupPage() {
                 type="text"
                 autoComplete="name"
                 className={inputClass}
+                style={inputStyle}
                 placeholder="Alex Smith"
               />
             </label>
 
             <label className="flex flex-col gap-1.5">
-              <span className="text-xs font-semibold uppercase tracking-wide text-muted">
+              <span
+                style={{
+                  fontSize: "0.7rem",
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                  color: "#888888",
+                }}
+              >
                 Email
               </span>
               <input
@@ -69,12 +121,21 @@ export default function SignupPage() {
                 autoComplete="email"
                 required
                 className={inputClass}
+                style={inputStyle}
                 placeholder="you@example.com"
               />
             </label>
 
             <label className="flex flex-col gap-1.5">
-              <span className="text-xs font-semibold uppercase tracking-wide text-muted">
+              <span
+                style={{
+                  fontSize: "0.7rem",
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                  color: "#888888",
+                }}
+              >
                 Password
               </span>
               <input
@@ -84,6 +145,7 @@ export default function SignupPage() {
                 required
                 minLength={8}
                 className={inputClass}
+                style={inputStyle}
                 placeholder="At least 8 characters"
               />
             </label>
@@ -91,7 +153,18 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={isPending}
-              className="rounded-xl bg-accent px-4 py-3 font-semibold text-accent-foreground disabled:opacity-60"
+              style={{
+                background: "linear-gradient(135deg, #6366f1 0%, #818cf8 100%)",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "0.75rem",
+                padding: "0.8rem 1rem",
+                fontSize: "0.9rem",
+                fontWeight: 600,
+                cursor: isPending ? "not-allowed" : "pointer",
+                opacity: isPending ? 0.6 : 1,
+                boxShadow: "0 4px 20px rgba(99,102,241,0.35)",
+              }}
             >
               {isPending ? "Creating account…" : "Create account"}
             </button>
@@ -99,9 +172,12 @@ export default function SignupPage() {
         </>
       )}
 
-      <p className="text-center text-sm text-muted">
+      <p style={{ textAlign: "center", fontSize: "0.85rem", color: "#888888" }}>
         Already have an account?{" "}
-        <Link href="/login" className="font-medium text-accent hover:underline">
+        <Link
+          href="/login"
+          style={{ color: "#6366f1", fontWeight: 600, textDecoration: "none" }}
+        >
           Sign in
         </Link>
       </p>

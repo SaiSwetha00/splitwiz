@@ -429,9 +429,9 @@ function SpendingChart({ data, sym }: { data: DashboardStats; sym: string }) {
       <ResponsiveContainer width="100%" height={200}>
         <AreaChart data={labeled} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
           <defs>
-            <linearGradient id="tealGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.25} />
-              <stop offset="95%" stopColor="#14b8a6" stopOpacity={0} />
+            <linearGradient id="indigoGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(128,128,128,0.12)" vertical={false} />
@@ -461,11 +461,11 @@ function SpendingChart({ data, sym }: { data: DashboardStats; sym: string }) {
           <Area
             type="monotone"
             dataKey="amount"
-            stroke="#14b8a6"
+            stroke="#6366f1"
             strokeWidth={2}
-            fill="url(#tealGrad)"
+            fill="url(#indigoGrad)"
             dot={false}
-            activeDot={{ r: 3, fill: '#14b8a6' }}
+            activeDot={{ r: 3, fill: '#6366f1' }}
           />
         </AreaChart>
       </ResponsiveContainer>
@@ -634,7 +634,8 @@ export function DashboardClient({ displayName }: Props) {
         </div>
         <Link
           href="/dashboard/trips"
-          className="shrink-0 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90"
+          className="shrink-0 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          style={{ background: "linear-gradient(135deg, #6366f1 0%, #818cf8 100%)", boxShadow: "0 2px 14px rgba(99,102,241,0.35)" }}
         >
           + New trip
         </Link>
