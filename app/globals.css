@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════════════════
+   DARK MODE (default) — premium deep fintech
+   ═══════════════════════════════════════════════════════════════ */
 :root {
-  /* Premium dark palette */
-  --background: #0a0a14;
+  --background: #080810;
   --surface: #0f0f1a;
   --surface-hover: #13131f;
   --foreground: #ffffff;
@@ -38,8 +40,114 @@
   --glass-border-hover: rgba(255, 255, 255, 0.14);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   --glass-shadow-hover: 0 20px 48px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+  /* Auth form card */
+  --auth-card-bg: rgba(15, 15, 26, 0.8);
+  --auth-card-border: rgba(99, 102, 241, 0.2);
+  --auth-card-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+  --auth-divider: rgba(99, 102, 241, 0.15);
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT MODE — green minimal finance (Image 1 inspired)
+   ═══════════════════════════════════════════════════════════════ */
+:root[data-theme="light"] {
+  --background: #f0f4f0;
+  --surface: #ffffff;
+  --surface-hover: #f8faf8;
+  --foreground: #1a1a1a;
+  --muted: #6b7280;
+  --muted-2: rgba(0, 0, 0, 0.35);
+  --border: rgba(0, 0, 0, 0.08);
+  --border-accent: rgba(45, 90, 39, 0.2);
+  --accent: #2d5a27;
+  --accent-foreground: #ffffff;
+  --accent-teal: #0e7490;
+  --accent-green: #22c55e;
+  --accent-red: #dc2626;
+  --accent-amber: #d97706;
+  --accent-purple: #7c3aed;
+  --positive: #16a34a;
+  --negative: #dc2626;
+
+  /* Sidebar: deep forest green */
+  --sidebar: #1a2e1a;
+  --sidebar-border: rgba(255, 255, 255, 0.09);
+  --sidebar-fg: rgba(255, 255, 255, 0.55);
+  --sidebar-fg-active: #ffffff;
+  --sidebar-active: rgba(74, 143, 63, 0.22);
+  --sidebar-hover: rgba(255, 255, 255, 0.09);
+
+  /* Card system — clean white */
+  --glass-bg: #ffffff;
+  --glass-bg-hover: #f8faf8;
+  --glass-border: rgba(0, 0, 0, 0.07);
+  --glass-border-hover: rgba(45, 90, 39, 0.18);
+  --glass-shadow: 0 2px 12px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --glass-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.05);
+
+  /* Auth form card */
+  --auth-card-bg: #ffffff;
+  --auth-card-border: rgba(0, 0, 0, 0.1);
+  --auth-card-shadow: 0 4px 32px rgba(0, 0, 0, 0.09);
+  --auth-divider: rgba(0, 0, 0, 0.1);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EXPLICIT DARK THEME (data-theme="dark")
+   ═══════════════════════════════════════════════════════════════ */
+:root[data-theme="dark"] {
+  --background: #080810;
+  --surface: #0f0f1a;
+  --surface-hover: #13131f;
+  --foreground: #ffffff;
+  --muted: #94a3b8;
+  --muted-2: rgba(255, 255, 255, 0.35);
+  --border: rgba(255, 255, 255, 0.07);
+  --border-accent: rgba(99, 102, 241, 0.2);
+  --accent: #6366f1;
+  --accent-foreground: #ffffff;
+  --positive: #45D881;
+  --negative: #FE1514;
+  --sidebar: rgba(8, 8, 16, 0.98);
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-fg: rgba(255, 255, 255, 0.45);
+  --sidebar-fg-active: #ffffff;
+  --sidebar-active: rgba(99, 102, 241, 0.12);
+  --sidebar-hover: rgba(255, 255, 255, 0.04);
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-bg-hover: rgba(255, 255, 255, 0.07);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-hover: rgba(255, 255, 255, 0.14);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --glass-shadow-hover: 0 20px 48px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* OS-level dark preference */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: #080810;
+    --surface: #0f0f1a;
+    --surface-hover: #13131f;
+    --foreground: #ffffff;
+    --muted: #94a3b8;
+    --muted-2: rgba(255, 255, 255, 0.35);
+    --border: rgba(255, 255, 255, 0.07);
+    --border-accent: rgba(99, 102, 241, 0.2);
+    --accent: #6366f1;
+    --accent-foreground: #ffffff;
+    --positive: #45D881;
+    --negative: #FE1514;
+    --sidebar: rgba(8, 8, 16, 0.98);
+    --sidebar-border: rgba(255, 255, 255, 0.06);
+    --sidebar-active: rgba(99, 102, 241, 0.12);
+    --sidebar-hover: rgba(255, 255, 255, 0.04);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TAILWIND TOKEN MAP
+   ═══════════════════════════════════════════════════════════════ */
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
@@ -61,102 +169,44 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* Dark OS preference */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a14;
-    --surface: #0f0f1a;
-    --surface-hover: #13131f;
-    --foreground: #ffffff;
-    --muted: #94a3b8;
-    --muted-2: rgba(255, 255, 255, 0.35);
-    --border: rgba(255, 255, 255, 0.07);
-    --border-accent: rgba(99, 102, 241, 0.2);
-    --accent: #6366f1;
-    --accent-foreground: #ffffff;
-    --positive: #45D881;
-    --negative: #FE1514;
-    --sidebar: rgba(8, 8, 16, 0.98);
-    --sidebar-border: rgba(255, 255, 255, 0.06);
-    --sidebar-active: rgba(99, 102, 241, 0.12);
-    --sidebar-hover: rgba(255, 255, 255, 0.04);
-  }
-}
-
-/* Light theme */
-:root[data-theme="light"] {
-  --background: #f1f3f7;
-  --surface: #ffffff;
-  --surface-hover: #f8fafc;
-  --foreground: #0f172a;
-  --muted: #64748b;
-  --muted-2: rgba(0, 0, 0, 0.35);
-  --border: #e2e8f0;
-  --border-accent: rgba(79, 70, 229, 0.2);
-  --accent: #4f46e5;
-  --accent-foreground: #ffffff;
-  --positive: #059669;
-  --negative: #dc2626;
-  --sidebar: #13141f;
-  --sidebar-border: rgba(255, 255, 255, 0.07);
-  --sidebar-fg: rgba(255, 255, 255, 0.42);
-  --sidebar-fg-active: #ffffff;
-  --sidebar-active: rgba(99, 102, 241, 0.18);
-  --sidebar-hover: rgba(255, 255, 255, 0.06);
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-bg-hover: rgba(255, 255, 255, 0.95);
-  --glass-border: rgba(0, 0, 0, 0.08);
-  --glass-border-hover: rgba(0, 0, 0, 0.14);
-  --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  --glass-shadow-hover: 0 12px 36px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 1);
-}
-
-/* Dark theme */
-:root[data-theme="dark"] {
-  --background: #0a0a14;
-  --surface: #0f0f1a;
-  --surface-hover: #13131f;
-  --foreground: #ffffff;
-  --muted: #94a3b8;
-  --muted-2: rgba(255, 255, 255, 0.35);
-  --border: rgba(255, 255, 255, 0.07);
-  --border-accent: rgba(99, 102, 241, 0.2);
-  --accent: #6366f1;
-  --accent-foreground: #ffffff;
-  --positive: #45D881;
-  --negative: #FE1514;
-  --sidebar: rgba(8, 8, 16, 0.98);
-  --sidebar-border: rgba(255, 255, 255, 0.06);
-  --sidebar-fg: rgba(255, 255, 255, 0.45);
-  --sidebar-fg-active: #ffffff;
-  --sidebar-active: rgba(99, 102, 241, 0.12);
-  --sidebar-hover: rgba(255, 255, 255, 0.04);
-}
-
-/* ─── Body: deep dark with layered gradient depth ─────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   BODY — layered atmospheric background
+   ═══════════════════════════════════════════════════════════════ */
 body {
   background:
-    radial-gradient(ellipse at 20% 10%, rgba(99, 102, 241, 0.09) 0%, transparent 45%),
-    radial-gradient(ellipse at 80% 85%, rgba(6, 182, 212, 0.06) 0%, transparent 45%),
-    radial-gradient(ellipse at 55% 55%, rgba(139, 92, 246, 0.04) 0%, transparent 35%),
+    radial-gradient(ellipse at 15% 15%, rgba(99, 102, 241, 0.09) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 85%, rgba(6, 182, 212, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.04) 0%, transparent 40%),
     var(--background);
   color: var(--foreground);
   font-family: 'DM Sans', var(--font-sans), Arial, Helvetica, sans-serif;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 :root[data-theme="light"] body {
   background:
-    radial-gradient(ellipse at 20% 10%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 85%, rgba(6, 182, 212, 0.04) 0%, transparent 50%),
-    var(--background);
+    radial-gradient(ellipse at 10% 15%, rgba(45, 90, 39, 0.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 90% 85%, rgba(74, 143, 63, 0.05) 0%, transparent 50%),
+    #f0f4f0;
 }
 
-/* ─── Headings: Clash Display ─────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   TYPOGRAPHY
+   ═══════════════════════════════════════════════════════════════ */
 h1, h2, h3, h4 {
   font-family: 'Clash Display', 'DM Sans', var(--font-sans), sans-serif;
 }
 
-/* ─── Input focus glow ────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   SMOOTH THEME TRANSITIONS
+   ═══════════════════════════════════════════════════════════════ */
+aside, header, main, nav {
+  transition: background 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FOCUS GLOW — uses per-page accent
+   ═══════════════════════════════════════════════════════════════ */
 input:focus,
 textarea:focus,
 select:focus {
@@ -165,31 +215,51 @@ select:focus {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--page-accent) 20%, transparent) !important;
 }
 
-/* ─── Smooth transitions ──────────────────────────────────────────────────── */
+:root[data-theme="light"] input:focus,
+:root[data-theme="light"] textarea:focus,
+:root[data-theme="light"] select:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INTERACTIVE ELEMENTS — transitions
+   ═══════════════════════════════════════════════════════════════ */
 a, button, input, select, textarea {
   transition: border-color 0.15s, box-shadow 0.15s, opacity 0.15s, background 0.2s, transform 0.2s, color 0.15s;
 }
 
-/* ─── Primary buttons: gradient shimmer ───────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   PRIMARY BUTTONS — accent gradient
+   ═══════════════════════════════════════════════════════════════ */
 button.bg-accent,
 a.bg-accent {
   background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%) !important;
-  box-shadow: 0 2px 14px rgba(99, 102, 241, 0.35);
-}
-:root[data-theme="light"] button.bg-accent,
-:root[data-theme="light"] a.bg-accent {
-  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
-  box-shadow: 0 2px 14px rgba(79, 70, 229, 0.25);
+  box-shadow: 0 2px 14px rgba(99, 102, 241, 0.35) !important;
+  color: #ffffff !important;
 }
 
-/* ─── Custom scrollbar ────────────────────────────────────────────────────── */
+:root[data-theme="light"] button.bg-accent,
+:root[data-theme="light"] a.bg-accent {
+  background: linear-gradient(135deg, #2d5a27 0%, #4a8f3f 100%) !important;
+  box-shadow: 0 2px 14px rgba(45, 90, 39, 0.3) !important;
+  color: #ffffff !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCROLLBAR
+   ═══════════════════════════════════════════════════════════════ */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
 
-/* ─── Animations ──────────────────────────────────────────────────────────── */
+:root[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); }
+:root[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.25); }
 
+/* ═══════════════════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════════════════ */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -241,7 +311,9 @@ a.bg-accent {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ─── Stagger fade for grids ──────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   STAGGER FADE GRID
+   ═══════════════════════════════════════════════════════════════ */
 .stagger-fade > * {
   animation: fadeIn 0.4s ease-out backwards;
 }
@@ -254,7 +326,9 @@ a.bg-accent {
 .stagger-fade > *:nth-child(7) { animation-delay: 0.42s; }
 .stagger-fade > *:nth-child(8) { animation-delay: 0.49s; }
 
-/* ─── Card hover lift + glow ──────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   CARD HOVER LIFT
+   ═══════════════════════════════════════════════════════════════ */
 .card-hover {
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
@@ -262,8 +336,14 @@ a.bg-accent {
   transform: translateY(-3px);
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
+:root[data-theme="light"] .card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(45, 90, 39, 0.12);
+}
 
-/* ─── Button shimmer ──────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   BUTTON SHIMMER
+   ═══════════════════════════════════════════════════════════════ */
 .btn-shimmer {
   background: linear-gradient(135deg, #6366f1 0%, #818cf8 40%, #6366f1 100%);
   background-size: 200% auto;
@@ -274,13 +354,24 @@ a.bg-accent {
   transform: translateY(-1px);
   box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
 }
+:root[data-theme="light"] .btn-shimmer {
+  background: linear-gradient(135deg, #2d5a27 0%, #4a8f3f 40%, #2d5a27 100%);
+  background-size: 200% auto;
+}
+:root[data-theme="light"] .btn-shimmer:hover {
+  box-shadow: 0 8px 20px rgba(45, 90, 39, 0.35);
+}
 
-/* ─── Progress bar animate ────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   PROGRESS BAR ANIMATE
+   ═══════════════════════════════════════════════════════════════ */
 .progress-animated {
   animation: progressFill 0.9s ease-out forwards;
 }
 
-/* ─── Glass card (primary reusable class) ─────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   GLASS CARD — primary reusable class
+   ═══════════════════════════════════════════════════════════════ */
 .glass-card {
   background: var(--glass-bg);
   backdrop-filter: blur(20px) saturate(180%);
@@ -297,7 +388,15 @@ a.bg-accent {
   box-shadow: var(--glass-shadow-hover);
 }
 
-/* ─── Glass input ─────────────────────────────────────────────────────────── */
+/* Light mode: no backdrop-filter needed (white cards are opaque) */
+:root[data-theme="light"] .glass-card {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GLASS INPUT
+   ═══════════════════════════════════════════════════════════════ */
 .glass-input {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.09);
@@ -311,8 +410,53 @@ a.bg-accent {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--page-accent) 18%, transparent) !important;
 }
 
-/* ─── Cards inside main content area ─────────────────────────────────────── */
-/* Enhance existing Tailwind .bg-surface cards to have glass depth */
+/* ═══════════════════════════════════════════════════════════════
+   AUTH FORM CARD — theme-aware glass card
+   ═══════════════════════════════════════════════════════════════ */
+.auth-form-card {
+  background: rgba(15, 15, 26, 0.8) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(99, 102, 241, 0.2) !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 80px rgba(99, 102, 241, 0.04) !important;
+}
+:root[data-theme="light"] .auth-form-card {
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.09), 0 1px 6px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AUTH INPUT — dual-theme input class
+   ═══════════════════════════════════════════════════════════════ */
+.auth-input {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(99, 102, 241, 0.2);
+  color: #ffffff;
+}
+.auth-input:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+  outline: none;
+}
+.auth-input::placeholder { color: rgba(255, 255, 255, 0.35); }
+
+:root[data-theme="light"] .auth-input {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.14);
+  color: #1a1a1a;
+}
+:root[data-theme="light"] .auth-input:focus {
+  border-color: #2d5a27 !important;
+  box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.18) !important;
+}
+:root[data-theme="light"] .auth-input::placeholder { color: rgba(0, 0, 0, 0.35); }
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN CONTENT CARDS — bg-surface enhancement
+   ═══════════════════════════════════════════════════════════════ */
 main .bg-surface {
   background: rgba(12, 12, 22, 0.82) !important;
   backdrop-filter: blur(20px) saturate(160%);
@@ -331,14 +475,55 @@ main .bg-surface:hover {
   transform: translateY(-2px);
 }
 
-/* Light theme override for main cards */
+/* Light mode: clean white cards */
 :root[data-theme="light"] main .bg-surface {
-  background: rgba(255, 255, 255, 0.88) !important;
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   border-color: rgba(0, 0, 0, 0.07) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+:root[data-theme="light"] main .bg-surface:hover {
+  border-color: rgba(45, 90, 39, 0.18) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-2px);
 }
 
-/* ─── Sidebar badge ───────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT MODE — INLINE-STYLED CARD OVERRIDE
+   Cards in budgets/savings/subscriptions/transactions use inline
+   background: rgba(10,10,22,*). In light mode we flip them white.
+   ═══════════════════════════════════════════════════════════════ */
+:root[data-theme="light"] [style*="rgba(10,10,22"] {
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+}
+:root[data-theme="light"] [style*="rgba(10, 10, 22"] {
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+}
+/* Subscription stat cards have colored left border — preserve it */
+:root[data-theme="light"] [style*="rgba(6,182,212,0.2)"] {
+  border-color: rgba(14, 116, 144, 0.3) !important;
+}
+:root[data-theme="light"] [style*="rgba(99,102,241,0.2)"] {
+  border-color: rgba(45, 90, 39, 0.25) !important;
+}
+
+/* bg-background inputs in light mode */
+:root[data-theme="light"] .bg-background {
+  background-color: #f8faf8 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SIDEBAR BADGE
+   ═══════════════════════════════════════════════════════════════ */
 .sidebar-badge {
   font-size: 9px;
   font-weight: 700;
@@ -350,13 +535,55 @@ main .bg-surface:hover {
   animation: badgePulse 2.2s ease-in-out infinite;
 }
 
-/* ─── Page decorative SVG backgrounds ────────────────────────────────────── */
-/* Each page gets a subtle themed SVG pattern via CSS */
+/* ═══════════════════════════════════════════════════════════════
+   SIDEBAR LIGHT MODE OVERRIDES
+   (override inline styles on NavLink with !important)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Active nav item — green in light mode */
+:root[data-theme="light"] a[data-active="true"] {
+  background: rgba(74, 143, 63, 0.18) !important;
+  border-left-color: #4a8f3f !important;
+  color: #ffffff !important;
+}
+:root[data-theme="light"] a[data-active="true"] > span:first-child {
+  color: #4a8f3f !important;
+  filter: drop-shadow(0 0 5px rgba(74, 143, 63, 0.5)) !important;
+  opacity: 1 !important;
+}
+
+/* Hover state — light translucent white on green sidebar */
+:root[data-theme="light"] a[data-active="false"]:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+:root[data-theme="light"] a[data-active="false"]:hover > span:first-child {
+  opacity: 0.88 !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  filter: none !important;
+}
+
+/* New Trip CTA button — green in light mode */
+:root[data-theme="light"] a.sidebar-new-trip {
+  background: linear-gradient(135deg, #2d5a27 0%, #4a8f3f 100%) !important;
+  box-shadow: 0 3px 14px rgba(45, 90, 39, 0.4) !important;
+}
+
+/* Free plan text — green gradient in light mode */
+:root[data-theme="light"] .sidebar-free-plan {
+  background: linear-gradient(90deg, #2d5a27, #4a8f3f) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DECORATIVE PAGE SVG BACKGROUNDS (dark mode only)
+   ═══════════════════════════════════════════════════════════════ */
 main[data-page]::before {
   content: '';
   position: fixed;
   top: 0;
-  left: 220px; /* sidebar width */
+  left: 220px;
   right: 0;
   bottom: 0;
   pointer-events: none;
@@ -366,6 +593,11 @@ main[data-page]::before {
   background-size: 600px 600px;
   background-position: top right;
   animation: glowPulseAccent 6s ease-in-out infinite;
+}
+
+/* Hide in light mode */
+:root[data-theme="light"] main[data-page]::before {
+  display: none;
 }
 
 main[data-page="/dashboard"]::before {
@@ -422,7 +654,55 @@ main > * {
   z-index: 1;
 }
 
-/* ─── Page load animation on main content ─────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   PAGE LOAD ANIMATION
+   ═══════════════════════════════════════════════════════════════ */
 main > div {
   animation: fadeIn 0.35s ease-out;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT MODE — TOPBAR & MISC OVERRIDES
+   ═══════════════════════════════════════════════════════════════ */
+
+/* bg-background utility in light mode */
+:root[data-theme="light"] .bg-background {
+  background-color: #f8faf8 !important;
+}
+
+/* border-dashed empty states */
+:root[data-theme="light"] .border-dashed {
+  border-color: rgba(0, 0, 0, 0.14) !important;
+}
+
+/* accent hover borders */
+:root[data-theme="light"] .hover\:border-accent:hover {
+  border-color: #2d5a27 !important;
+}
+
+/* text-accent in light mode */
+:root[data-theme="light"] .text-accent {
+  color: #2d5a27 !important;
+}
+
+/* bg-accent/10 — green tint in light mode */
+:root[data-theme="light"] .bg-accent\/10 {
+  background-color: rgba(45, 90, 39, 0.1) !important;
+}
+
+/* AI assistant input area in light mode */
+:root[data-theme="light"] [style*="rgba(14,14,26"],
+:root[data-theme="light"] [style*="rgba(15,15,26"],
+:root[data-theme="light"] [style*="rgba(12,12,22"] {
+  background: rgba(248, 250, 248, 0.95) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  color: #1a1a1a !important;
+  backdrop-filter: none !important;
+}
+
+/* Transaction row text in light mode */
+:root[data-theme="light"] [style*="color: \"#fff\""],
+:root[data-theme="light"] [style*="color: '#fff'"] {
+  color: #1a1a1a !important;
+}
+

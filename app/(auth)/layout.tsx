@@ -10,7 +10,7 @@ export default function AuthLayout({
       style={{
         minHeight: "100vh",
         display: "flex",
-        background: "#090912",
+        background: "var(--background)",
       }}
     >
       {/* Left decorative panel */}
@@ -23,7 +23,7 @@ export default function AuthLayout({
           padding: "3rem",
           position: "relative",
           overflow: "hidden",
-          background: "linear-gradient(135deg, #090912 0%, #0a0a1a 100%)",
+          background: "var(--background)",
         }}
         className="auth-left-panel"
       >
@@ -186,12 +186,11 @@ export default function AuthLayout({
             gap: 8,
             marginBottom: "1.75rem",
             textDecoration: "none",
-            color: "#ffffff",
+            color: "var(--foreground)",
             fontFamily: "'Clash Display', sans-serif",
             fontSize: 20,
             fontWeight: 700,
             letterSpacing: "-0.03em",
-            textShadow: "0 0 30px rgba(99,102,241,0.5)",
           }}
           className="auth-mobile-logo"
         >
@@ -213,13 +212,13 @@ export default function AuthLayout({
           style={{
             width: "100%",
             maxWidth: 400,
-            background: "rgba(15,15,26,0.8)",
+            background: "var(--auth-card-bg)",
             backdropFilter: "blur(24px)",
             WebkitBackdropFilter: "blur(24px)",
-            border: "1px solid rgba(99,102,241,0.2)",
+            border: "1px solid var(--auth-card-border)",
             borderRadius: "1.25rem",
             padding: "2rem",
-            boxShadow: "0 25px 60px rgba(0,0,0,0.5), 0 0 80px rgba(99,102,241,0.04)",
+            boxShadow: "var(--auth-card-shadow)",
           }}
         >
           {children}

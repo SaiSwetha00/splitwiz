@@ -6,13 +6,7 @@ import { signIn, type AuthFormState } from "@/lib/auth/actions";
 import { GoogleButton } from "@/components/auth/GoogleButton";
 
 const inputClass =
-  "w-full rounded-lg border px-3 py-2.5 text-sm outline-none placeholder:opacity-40";
-
-const inputStyle = {
-  background: "rgba(255,255,255,0.04)",
-  borderColor: "rgba(99,102,241,0.2)",
-  color: "#ffffff",
-};
+  "auth-input w-full rounded-lg border px-3 py-2.5 text-sm outline-none";
 
 interface Props {
   urlMessage?: string;
@@ -35,14 +29,14 @@ export function LoginForm({ urlMessage, urlError }: Props) {
             fontFamily: "'Clash Display', sans-serif",
             fontSize: "1.5rem",
             fontWeight: 700,
-            color: "#ffffff",
+            color: "var(--foreground)",
             letterSpacing: "-0.03em",
             margin: 0,
           }}
         >
           Welcome back
         </h1>
-        <p style={{ marginTop: 6, fontSize: "0.85rem", color: "#888888" }}>
+        <p style={{ marginTop: 6, fontSize: "0.85rem", color: "var(--muted)" }}>
           Sign in to your SplitWiz account
         </p>
       </div>
@@ -80,9 +74,9 @@ export function LoginForm({ urlMessage, urlError }: Props) {
       <GoogleButton label="Continue with Google" />
 
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <hr style={{ flex: 1, borderColor: "rgba(99,102,241,0.15)" }} />
-        <span style={{ fontSize: "0.75rem", color: "#888888" }}>or</span>
-        <hr style={{ flex: 1, borderColor: "rgba(99,102,241,0.15)" }} />
+        <hr style={{ flex: 1, borderColor: "var(--auth-divider)" }} />
+        <span style={{ fontSize: "0.75rem", color: "var(--muted)" }}>or</span>
+        <hr style={{ flex: 1, borderColor: "var(--auth-divider)" }} />
       </div>
 
       <form action={formAction} className="flex flex-col gap-4">
@@ -93,7 +87,7 @@ export function LoginForm({ urlMessage, urlError }: Props) {
               fontWeight: 600,
               textTransform: "uppercase",
               letterSpacing: "0.08em",
-              color: "#888888",
+              color: "var(--muted)",
             }}
           >
             Email
@@ -104,7 +98,6 @@ export function LoginForm({ urlMessage, urlError }: Props) {
             autoComplete="email"
             required
             className={inputClass}
-            style={inputStyle}
             placeholder="you@example.com"
           />
         </label>
@@ -117,14 +110,14 @@ export function LoginForm({ urlMessage, urlError }: Props) {
                 fontWeight: 600,
                 textTransform: "uppercase",
                 letterSpacing: "0.08em",
-                color: "#888888",
+                color: "var(--muted)",
               }}
             >
               Password
             </span>
             <Link
               href="/forgot-password"
-              style={{ fontSize: "0.75rem", color: "#6366f1", textDecoration: "none" }}
+              style={{ fontSize: "0.75rem", color: "var(--accent)", textDecoration: "none" }}
             >
               Forgot password?
             </Link>
@@ -135,7 +128,6 @@ export function LoginForm({ urlMessage, urlError }: Props) {
             autoComplete="current-password"
             required
             className={inputClass}
-            style={inputStyle}
             placeholder="••••••••"
           />
         </label>
@@ -162,22 +154,16 @@ export function LoginForm({ urlMessage, urlError }: Props) {
         </button>
       </form>
 
-      <p style={{ textAlign: "center", fontSize: "0.85rem", color: "#888888" }}>
+      <p style={{ textAlign: "center", fontSize: "0.85rem", color: "var(--muted)" }}>
         Don&apos;t have an account?{" "}
         <Link
           href="/signup"
-          style={{ color: "#6366f1", fontWeight: 600, textDecoration: "none" }}
+          style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}
         >
           Sign up free
         </Link>
       </p>
 
-      <style>{`
-        .auth-input:focus {
-          border-color: #6366f1 !important;
-          box-shadow: 0 0 0 3px rgba(99,102,241,0.2) !important;
-        }
-      `}</style>
     </div>
   );
 }

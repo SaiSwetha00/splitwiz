@@ -6,13 +6,7 @@ import { signUp, type AuthFormState } from "@/lib/auth/actions";
 import { GoogleButton } from "@/components/auth/GoogleButton";
 
 const inputClass =
-  "w-full rounded-lg border px-3 py-2.5 text-sm outline-none placeholder:opacity-40";
-
-const inputStyle = {
-  background: "rgba(255,255,255,0.04)",
-  borderColor: "rgba(99,102,241,0.2)",
-  color: "#ffffff",
-};
+  "auth-input w-full rounded-lg border px-3 py-2.5 text-sm outline-none";
 
 export default function SignupPage() {
   const [state, formAction, isPending] = useActionState<AuthFormState, FormData>(
@@ -28,14 +22,14 @@ export default function SignupPage() {
             fontFamily: "'Clash Display', sans-serif",
             fontSize: "1.5rem",
             fontWeight: 700,
-            color: "#ffffff",
+            color: "var(--foreground)",
             letterSpacing: "-0.03em",
             margin: 0,
           }}
         >
           Create an account
         </h1>
-        <p style={{ marginTop: 6, fontSize: "0.85rem", color: "#888888" }}>
+        <p style={{ marginTop: 6, fontSize: "0.85rem", color: "var(--muted)" }}>
           Start splitting expenses with SplitWiz
         </p>
       </div>
@@ -75,9 +69,9 @@ export default function SignupPage() {
           <GoogleButton label="Sign up with Google" />
 
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <hr style={{ flex: 1, borderColor: "rgba(99,102,241,0.15)" }} />
-            <span style={{ fontSize: "0.75rem", color: "#888888" }}>or</span>
-            <hr style={{ flex: 1, borderColor: "rgba(99,102,241,0.15)" }} />
+            <hr style={{ flex: 1, borderColor: "var(--auth-divider)" }} />
+            <span style={{ fontSize: "0.75rem", color: "var(--muted)" }}>or</span>
+            <hr style={{ flex: 1, borderColor: "var(--auth-divider)" }} />
           </div>
 
           <form action={formAction} className="flex flex-col gap-4">
@@ -88,7 +82,7 @@ export default function SignupPage() {
                   fontWeight: 600,
                   textTransform: "uppercase",
                   letterSpacing: "0.08em",
-                  color: "#888888",
+                  color: "var(--muted)",
                 }}
               >
                 Name
@@ -98,7 +92,7 @@ export default function SignupPage() {
                 type="text"
                 autoComplete="name"
                 className={inputClass}
-                style={inputStyle}
+
                 placeholder="Alex Smith"
               />
             </label>
@@ -110,7 +104,7 @@ export default function SignupPage() {
                   fontWeight: 600,
                   textTransform: "uppercase",
                   letterSpacing: "0.08em",
-                  color: "#888888",
+                  color: "var(--muted)",
                 }}
               >
                 Email
@@ -121,7 +115,7 @@ export default function SignupPage() {
                 autoComplete="email"
                 required
                 className={inputClass}
-                style={inputStyle}
+
                 placeholder="you@example.com"
               />
             </label>
@@ -133,7 +127,7 @@ export default function SignupPage() {
                   fontWeight: 600,
                   textTransform: "uppercase",
                   letterSpacing: "0.08em",
-                  color: "#888888",
+                  color: "var(--muted)",
                 }}
               >
                 Password
@@ -145,7 +139,7 @@ export default function SignupPage() {
                 required
                 minLength={8}
                 className={inputClass}
-                style={inputStyle}
+
                 placeholder="At least 8 characters"
               />
             </label>
@@ -172,11 +166,11 @@ export default function SignupPage() {
         </>
       )}
 
-      <p style={{ textAlign: "center", fontSize: "0.85rem", color: "#888888" }}>
+      <p style={{ textAlign: "center", fontSize: "0.85rem", color: "var(--muted)" }}>
         Already have an account?{" "}
         <Link
           href="/login"
-          style={{ color: "#6366f1", fontWeight: 600, textDecoration: "none" }}
+          style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}
         >
           Sign in
         </Link>
