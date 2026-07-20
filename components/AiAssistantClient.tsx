@@ -320,14 +320,15 @@ export function AiAssistantClient({ displayName, initialContext }: Props) {
                 borderRadius: msg.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
                 background:
                   msg.role === "user"
-                    ? "var(--accent)"
-                    : "var(--surface)",
-                color:
-                  msg.role === "user"
-                    ? "var(--accent-foreground)"
-                    : "inherit",
+                    ? "linear-gradient(135deg, #6366f1 0%, #818cf8 100%)"
+                    : "rgba(15,15,26,0.9)",
+                color: "#fff",
                 border:
-                  msg.role === "assistant" ? "1px solid var(--border)" : "none",
+                  msg.role === "assistant" ? "1px solid rgba(255,255,255,0.06)" : "none",
+                boxShadow:
+                  msg.role === "user"
+                    ? "0 4px 14px rgba(99,102,241,0.35)"
+                    : "none",
                 fontSize: 14,
                 lineHeight: 1.5,
                 whiteSpace: "pre-wrap",
@@ -366,11 +367,12 @@ export function AiAssistantClient({ displayName, initialContext }: Props) {
               style={{
                 padding: "6px 12px",
                 borderRadius: 20,
-                border: "1px solid var(--border)",
-                background: "var(--surface)",
+                border: "1px solid rgba(99,102,241,0.25)",
+                background: "rgba(99,102,241,0.08)",
+                color: "#94a3b8",
                 fontSize: 13,
                 cursor: "pointer",
-                transition: "border-color 0.15s",
+                transition: "border-color 0.15s, color 0.15s",
               }}
             >
               {chip}
@@ -413,17 +415,18 @@ export function AiAssistantClient({ displayName, initialContext }: Props) {
           style={{
             flex: 1,
             resize: "none",
-            border: "1px solid var(--border)",
+            border: "1px solid rgba(255,255,255,0.08)",
             borderRadius: 12,
             padding: "10px 14px",
             fontSize: 14,
-            background: "var(--background)",
-            color: "inherit",
+            background: "rgba(15,15,26,0.8)",
+            color: "#ffffff",
             fontFamily: "inherit",
             lineHeight: 1.5,
             maxHeight: 120,
             overflowY: "auto",
             outline: "none",
+            boxShadow: "inset 0 1px 2px rgba(0,0,0,0.3)",
           }}
           onInput={(e) => {
             const el = e.currentTarget;
@@ -459,14 +462,15 @@ export function AiAssistantClient({ displayName, initialContext }: Props) {
             height: 40,
             borderRadius: "50%",
             border: "none",
-            background: "var(--accent)",
-            color: "var(--accent-foreground)",
+            background: "linear-gradient(135deg, #6366f1 0%, #818cf8 100%)",
+            color: "#fff",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             fontSize: 18,
             flexShrink: 0,
+            boxShadow: "0 4px 12px rgba(99,102,241,0.4)",
             opacity: isStreaming || !input.trim() ? 0.5 : 1,
           }}
         >

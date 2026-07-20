@@ -401,6 +401,7 @@ export default function ProfilePage() {
                 className="group relative block"
                 title="Change photo"
                 disabled={avatarUploading}
+                style={{ borderRadius: "50%", boxShadow: "0 0 0 3px rgba(69,216,129,0.3), 0 0 18px rgba(69,216,129,0.15)" }}
               >
                 <AvatarCircle url={avatarUrl} name={displayName} size={88} />
                 <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition group-hover:opacity-100">
@@ -453,11 +454,13 @@ export default function ProfilePage() {
                 {nameOk && <span className="text-xs text-positive">✓ Saved</span>}
               </div>
               <p className="mt-0.5 text-sm text-muted truncate">{email}</p>
-              <span className={`mt-2 inline-flex items-center rounded-full px-3 py-0.5 text-xs font-semibold ${
-                isPremium
-                  ? "bg-amber-400/20 text-amber-600 dark:text-amber-300"
-                  : "bg-muted/20 text-muted"
-              }`}>
+              <span
+                className="mt-2 inline-flex items-center rounded-full px-3 py-0.5 text-xs font-semibold"
+                style={isPremium
+                  ? { background: "rgba(245,158,11,0.12)", color: "#F59E0B" }
+                  : { background: "rgba(255,255,255,0.06)", color: "#94a3b8" }
+                }
+              >
                 {isPremium ? "👑 Premium Member" : "Free Plan"}
               </span>
             </div>

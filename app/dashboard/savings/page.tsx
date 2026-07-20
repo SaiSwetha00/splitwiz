@@ -280,98 +280,95 @@ export default function SavingsPage() {
             return (
               <div
                 key={g.id}
-                className="rounded-2xl border border-border bg-surface p-5"
+                style={{
+                  borderRadius: 16, border: "1px solid rgba(255,255,255,0.06)",
+                  background: "#0f0f1a", padding: 20,
+                  transition: "border-color 0.2s, transform 0.2s",
+                }}
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{g.icon ?? "🏦"}</span>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{
+                      width: 44, height: 44, borderRadius: 12,
+                      background: "linear-gradient(135deg, #065f46, #45D881)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 22, flexShrink: 0,
+                    }}>
+                      {g.icon ?? "🏦"}
+                    </div>
                     <div>
-                      <p className="font-semibold">{g.name}</p>
+                      <p style={{ fontWeight: 600, fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "#fff", margin: 0 }}>{g.name}</p>
                       {g.deadline && (
-                        <p className="text-xs text-muted">
-                          Deadline:{" "}
-                          {new Date(g.deadline).toLocaleDateString(undefined, {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
-                        </p>
+                        <span style={{
+                          display: "inline-block", marginTop: 4,
+                          fontSize: 11, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+                          color: "#F59E0B", background: "rgba(245,158,11,0.1)",
+                          border: "1px solid rgba(245,158,11,0.25)", borderRadius: 6,
+                          padding: "1px 8px",
+                        }}>
+                          📅 {new Date(g.deadline).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                        </span>
                       )}
                     </div>
                   </div>
-                  <div className="flex shrink-0 gap-1">
+                  <div style={{ display: "flex", flexShrink: 0, gap: 6 }}>
                     <button
-                      onClick={() => {
-                        setAddingFundsId(g.id);
-                        setFundAmount("");
-                      }}
-                      className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-positive hover:border-positive/30"
+                      onClick={() => { setAddingFundsId(g.id); setFundAmount(""); }}
+                      style={{ borderRadius: 8, border: "1px solid rgba(6,182,212,0.35)", padding: "5px 12px", fontSize: 12, fontWeight: 600, background: "transparent", color: "#06b6d4", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "background 0.15s" }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(6,182,212,0.08)"; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                     >
-                      + Funds
+                      + Add Funds
                     </button>
                     <button
                       onClick={() => openEdit(g)}
-                      className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted hover:text-foreground"
+                      style={{ borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)", padding: "5px 12px", fontSize: 12, fontWeight: 600, background: "transparent", color: "#94a3b8", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(g.id)}
-                      className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-negative hover:border-negative/30"
+                      style={{ borderRadius: 8, border: "1px solid rgba(254,21,20,0.2)", padding: "5px 12px", fontSize: 12, fontWeight: 600, background: "transparent", color: "#FE1514", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
                     >
                       Delete
                     </button>
                   </div>
                 </div>
 
-                <div className="mt-4">
-                  <div className="mb-1.5 flex items-end justify-between text-sm">
-                    <span className="font-semibold">
-                      $
-                      {fromCents(g.current_cents).toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
+                <div style={{ marginTop: 16 }}>
+                  <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 8 }}>
+                    <span style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: 16, color: "#06b6d4" }}>
+                      ${fromCents(g.current_cents).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
-                    <span className="text-muted">
-                      of $
-                      {fromCents(g.target_cents).toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}{" "}
-                      · {pct}%
+                    <span style={{ fontSize: 12, color: "#94a3b8", fontFamily: "'DM Sans', sans-serif" }}>
+                      of ${fromCents(g.target_cents).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} · {pct}%
                     </span>
                   </div>
-                  <div className="h-2.5 overflow-hidden rounded-full bg-border">
-                    <div
-                      className="h-full rounded-full bg-positive transition-all"
-                      style={{ width: `${pct}%` }}
-                    />
+                  <div style={{ height: 8, borderRadius: 999, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
+                    <div style={{ height: "100%", borderRadius: 999, width: `${pct}%`, background: "linear-gradient(90deg, #065f46, #06b6d4)", transition: "width 0.6s ease" }} />
                   </div>
                 </div>
 
                 {addingFundsId === g.id && (
-                  <div className="mt-4 flex items-center gap-2">
+                  <div style={{ marginTop: 16, display: "flex", alignItems: "center", gap: 8 }}>
                     <input
-                      type="number"
-                      min="0.01"
-                      step="0.01"
+                      type="number" min="0.01" step="0.01"
                       value={fundAmount}
                       onChange={(e) => setFundAmount(e.target.value)}
                       placeholder="Amount to add"
-                      className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-accent focus:outline-none"
+                      style={{ flex: 1, borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)", background: "#090912", color: "#fff", padding: "8px 12px", fontSize: 13, fontFamily: "'DM Sans', sans-serif", outline: "none" }}
                       autoFocus
                     />
                     <button
                       onClick={() => handleAddFunds(g.id)}
                       disabled={addingFunds}
-                      className="rounded-lg bg-positive px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+                      style={{ borderRadius: 8, background: "linear-gradient(135deg, #065f46, #06b6d4)", color: "#fff", border: "none", padding: "8px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", opacity: addingFunds ? 0.5 : 1 }}
                     >
                       {addingFunds ? "..." : "Add"}
                     </button>
                     <button
                       onClick={() => setAddingFundsId(null)}
-                      className="rounded-lg border border-border px-3 py-2 text-sm text-muted hover:text-foreground"
+                      style={{ borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)", background: "transparent", color: "#94a3b8", padding: "8px 12px", fontSize: 13, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
                     >
                       Cancel
                     </button>

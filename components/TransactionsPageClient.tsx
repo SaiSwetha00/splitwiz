@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import type { Transaction, TransactionSummary, TransactionType, TransactionStatus } from "@/types/transactions";
 import { CsvImporter } from "./CsvImporter";
 import { BankStatementImporter } from "./BankStatementImporter";
@@ -18,9 +18,9 @@ function formatAmount(amount: number, type: TransactionType): string {
 }
 
 function amountColor(type: TransactionType): string {
-  if (type === "settlement_paid") return "text-red-500";
-  if (type === "settlement_received") return "text-green-600 dark:text-green-400";
-  return "text-foreground";
+  if (type === "settlement_paid") return "#FE1514";
+  if (type === "settlement_received") return "#45D881";
+  return "#ffffff";
 }
 
 function typeIcon(type: TransactionType | string): string {
@@ -30,11 +30,14 @@ function typeIcon(type: TransactionType | string): string {
   return "🔄";
 }
 
-function iconBg(type: TransactionType | string): string {
-  if (type === "settlement_paid") return "bg-red-100 dark:bg-red-900/30";
-  if (type === "settlement_received") return "bg-green-100 dark:bg-green-900/30";
-  if (type === "expense") return "bg-amber-100 dark:bg-amber-900/30";
-  return "bg-blue-100 dark:bg-blue-900/30";
+function iconBg(type: TransactionType | string): React.CSSProperties {
+  if (type === "settlement_paid")
+    return { background: "linear-gradient(135deg, #7f1d1d 0%, rgba(254,21,20,0.6) 100%)" };
+  if (type === "settlement_received")
+    return { background: "linear-gradient(135deg, #065f46 0%, rgba(69,216,129,0.6) 100%)" };
+  if (type === "expense")
+    return { background: "linear-gradient(135deg, #92400e 0%, rgba(245,158,11,0.6) 100%)" };
+  return { background: "linear-gradient(135deg, #1e1b4b 0%, rgba(99,102,241,0.6) 100%)" };
 }
 
 function typeLabel(type: TransactionType | string): string {
@@ -44,14 +47,14 @@ function typeLabel(type: TransactionType | string): string {
   return type;
 }
 
-function statusBadge(status: TransactionStatus | string): { label: string; cls: string } {
+function statusBadge(status: TransactionStatus | string): { label: string; style: React.CSSProperties } {
   if (status === "completed")
-    return { label: "Completed", cls: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" };
+    return { label: "Completed", style: { background: "rgba(69,216,129,0.12)", color: "#45D881" } };
   if (status === "pending")
-    return { label: "Pending", cls: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" };
+    return { label: "Pending", style: { background: "rgba(245,158,11,0.12)", color: "#F59E0B" } };
   if (status === "failed")
-    return { label: "Failed", cls: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" };
-  return { label: status, cls: "bg-gray-100 text-gray-600" };
+    return { label: "Failed", style: { background: "rgba(254,21,20,0.12)", color: "#FE1514" } };
+  return { label: status, style: { background: "rgba(255,255,255,0.06)", color: "#94a3b8" } };
 }
 
 function formatDate(iso: string): string {
@@ -308,7 +311,11 @@ export function TransactionsPageClient({ transactions, summary, trips = [] }: Pr
             return (
               <div
                 key={t.id}
-                className="rounded-2xl border border-border bg-surface transition hover:border-accent/40"
+                className="rounded-2xl transition"
+                style={{
+                  border: "1px solid rgba(255,255,255,0.06)",
+                  background: "#0f0f1a",
+                }}
               >
                 {/* Main row — click to toggle expand */}
                 <button
@@ -318,7 +325,8 @@ export function TransactionsPageClient({ transactions, summary, trips = [] }: Pr
                 >
                   {/* Icon */}
                   <span
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg ${iconBg(t.type)}`}
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg"
+                    style={iconBg(t.type)}
                     aria-hidden="true"
                   >
                     {typeIcon(t.type)}
@@ -348,11 +356,17 @@ export function TransactionsPageClient({ transactions, summary, trips = [] }: Pr
 
                   {/* Right: amount + badge */}
                   <div className="flex shrink-0 flex-col items-end gap-1">
-                    <span className={`text-sm font-semibold tabular-nums ${amountColor(t.type)}`}>
+                    <span
+                      className="text-sm font-semibold tabular-nums"
+                      style={{ color: amountColor(t.type), fontFamily: "'Clash Display', sans-serif" }}
+                    >
                       {formatAmount(t.amount, t.type)}{" "}
                       <span className="text-xs font-normal text-muted">{t.currency}</span>
                     </span>
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${badge.cls}`}>
+                    <span
+                      className="rounded-full px-2 py-0.5 text-[10px] font-medium"
+                      style={badge.style}
+                    >
                       {badge.label}
                     </span>
                   </div>

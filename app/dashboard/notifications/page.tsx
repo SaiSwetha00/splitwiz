@@ -211,8 +211,8 @@ export default function NotificationsPage() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border py-16 text-center">
-          <p className="text-3xl">✓</p>
+        <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border py-16 text-center" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+          <div style={{ fontSize: 44, filter: "drop-shadow(0 0 18px rgba(99,102,241,0.5))" }}>🔔</div>
           <p className="font-medium">You&apos;re all caught up!</p>
           <p className="text-sm text-muted">
             {tab === "all"
@@ -231,9 +231,12 @@ export default function NotificationsPage() {
                 {items.map((n) => (
                   <div
                     key={n.id}
-                    className={`group flex items-start gap-3 rounded-2xl border bg-surface p-4 transition-all ${
-                      !n.read ? "border-accent/40" : "border-border"
-                    }`}
+                    className="group flex items-start gap-3 rounded-2xl border bg-surface p-4 transition-all"
+                    style={{
+                      border: !n.read ? "1px solid rgba(99,102,241,0.2)" : "1px solid rgba(255,255,255,0.06)",
+                      borderLeft: !n.read ? "3px solid #6366f1" : undefined,
+                      background: !n.read ? "rgba(99,102,241,0.04)" : undefined,
+                    }}
                   >
                     <div
                       className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg"

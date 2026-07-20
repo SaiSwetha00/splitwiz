@@ -195,25 +195,25 @@ export default function SubscriptionsPage() {
       )}
 
       {activeSubs.length > 0 && (
-        <div className="mb-6 grid grid-cols-2 gap-3">
-          <div className="rounded-2xl border border-border bg-surface p-4">
-            <p className="text-xs text-muted">Monthly estimate</p>
-            <p className="mt-1 text-xl font-bold">
-              $
-              {fromCents(monthlyTotal).toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
+        <div style={{ marginBottom: 24, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div style={{
+            borderRadius: 16, background: "#0f0f1a",
+            border: "1px solid rgba(6,182,212,0.2)",
+            padding: 16, borderLeft: "3px solid #06b6d4",
+          }}>
+            <p style={{ fontSize: 12, color: "#94a3b8", fontFamily: "'DM Sans', sans-serif", margin: "0 0 6px" }}>Monthly estimate</p>
+            <p style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: "1.25rem", color: "#06b6d4", margin: 0 }}>
+              ${fromCents(monthlyTotal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
-          <div className="rounded-2xl border border-border bg-surface p-4">
-            <p className="text-xs text-muted">Annual estimate</p>
-            <p className="mt-1 text-xl font-bold">
-              $
-              {fromCents(yearlyTotal).toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
+          <div style={{
+            borderRadius: 16, background: "#0f0f1a",
+            border: "1px solid rgba(99,102,241,0.2)",
+            padding: 16, borderLeft: "3px solid #6366f1",
+          }}>
+            <p style={{ fontSize: 12, color: "#94a3b8", fontFamily: "'DM Sans', sans-serif", margin: "0 0 6px" }}>Annual estimate</p>
+            <p style={{ fontFamily: "'Clash Display', sans-serif", fontWeight: 700, fontSize: "1.25rem", color: "#6366f1", margin: 0 }}>
+              ${fromCents(yearlyTotal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
         </div>
@@ -349,76 +349,83 @@ export default function SubscriptionsPage() {
           </p>
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {subs.map((s) => (
             <div
               key={s.id}
-              className={`flex items-center justify-between gap-4 rounded-2xl border border-border bg-surface px-5 py-4 ${
-                !s.active ? "opacity-50" : ""
-              }`}
+              style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16,
+                borderRadius: 16, border: s.active ? "1px solid rgba(69,216,129,0.12)" : "1px solid rgba(255,255,255,0.06)",
+                background: "#0f0f1a", padding: "14px 20px",
+                opacity: s.active ? 1 : 0.55,
+                transition: "border-color 0.2s",
+              }}
             >
-              <div className="flex min-w-0 flex-1 flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  {s.category?.icon && (
-                    <span className="text-lg">{s.category.icon}</span>
+              <div style={{ display: "flex", minWidth: 0, flex: 1, flexDirection: "column", gap: 5 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  {s.category?.icon ? (
+                    <div style={{
+                      width: 34, height: 34, borderRadius: 9, flexShrink: 0,
+                      background: `linear-gradient(135deg, ${s.category.color ?? "#3730a3"}, ${s.category.color ? s.category.color + "cc" : "#6366f1"})`,
+                      display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16,
+                    }}>
+                      {s.category.icon}
+                    </div>
+                  ) : (
+                    <div style={{
+                      width: 34, height: 34, borderRadius: 9, flexShrink: 0,
+                      background: "linear-gradient(135deg, #1e1b4b, #6366f1)",
+                      display: "flex", alignItems: "center", justifyContent: "center", color: "#fff",
+                    }}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="1 4 1 10 7 10" /><polyline points="23 20 23 14 17 14" />
+                        <path d="M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15" />
+                      </svg>
+                    </div>
                   )}
-                  <span className="font-medium">{s.name}</span>
-                  {s.description && (
-                    <span className="text-xs text-muted">· {s.description}</span>
+                  <span style={{ fontWeight: 600, fontSize: 14, color: "#fff", fontFamily: "'DM Sans', sans-serif" }}>{s.name}</span>
+                  {s.description && <span style={{ fontSize: 12, color: "#94a3b8", fontFamily: "'DM Sans', sans-serif" }}>· {s.description}</span>}
+                  {s.active && (
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, color: "#45D881",
+                      background: "rgba(69,216,129,0.1)", border: "1px solid rgba(69,216,129,0.2)",
+                      borderRadius: 6, padding: "1px 7px", fontFamily: "'DM Sans', sans-serif",
+                      boxShadow: "0 0 8px rgba(69,216,129,0.15)",
+                    }}>Active</span>
                   )}
                 </div>
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted">
-                  <span className="font-semibold text-foreground">
-                    $
-                    {fromCents(s.amount_cents).toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}{" "}
-                    {s.currency}
+                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "3px 8px", fontSize: 12, color: "#94a3b8", fontFamily: "'DM Sans', sans-serif" }}>
+                  <span style={{ fontWeight: 700, color: "#ffffff" }}>
+                    ${fromCents(s.amount_cents).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {s.currency}
                   </span>
-                  <span>·</span>
-                  <span>{s.billing_cycle}</span>
-                  {s.category && (
-                    <>
-                      <span>·</span>
-                      <span>{s.category.name}</span>
-                    </>
-                  )}
+                  <span>·</span><span>{s.billing_cycle}</span>
+                  {s.category && <><span>·</span><span>{s.category.name}</span></>}
                   {s.next_billing_date && (
-                    <>
-                      <span>·</span>
-                      <span>
-                        Next:{" "}
-                        {new Date(s.next_billing_date).toLocaleDateString(undefined, {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                      </span>
-                    </>
+                    <><span>·</span><span>Next: {new Date(s.next_billing_date).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span></>
                   )}
                 </div>
               </div>
-              <div className="flex shrink-0 items-center gap-1">
+              <div style={{ display: "flex", flexShrink: 0, alignItems: "center", gap: 6 }}>
                 <button
                   onClick={() => toggleActive(s)}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
-                    s.active
-                      ? "border-positive/30 text-positive hover:border-positive"
-                      : "border-border text-muted hover:text-foreground"
-                  }`}
+                  style={{
+                    borderRadius: 8, padding: "5px 12px", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                    border: s.active ? "1px solid rgba(69,216,129,0.3)" : "1px solid rgba(255,255,255,0.08)",
+                    color: s.active ? "#45D881" : "#94a3b8", background: "transparent",
+                    transition: "all 0.15s",
+                  }}
                 >
                   {s.active ? "Active" : "Paused"}
                 </button>
                 <button
                   onClick={() => openEdit(s)}
-                  className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted hover:text-foreground"
+                  style={{ borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)", padding: "5px 12px", fontSize: 12, fontWeight: 600, background: "transparent", color: "#94a3b8", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => handleDelete(s.id)}
-                  className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-negative hover:border-negative/30"
+                  style={{ borderRadius: 8, border: "1px solid rgba(254,21,20,0.2)", padding: "5px 12px", fontSize: 12, fontWeight: 600, background: "transparent", color: "#FE1514", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
                 >
                   Delete
                 </button>

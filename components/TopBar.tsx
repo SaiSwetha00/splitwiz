@@ -8,9 +8,15 @@ import { ProfileMenu } from "@/components/ProfileMenu";
 const PAGE_TITLES: Record<string, string> = {
   "/dashboard": "Overview",
   "/dashboard/analytics": "Analytics",
+  "/dashboard/trips": "Trips",
+  "/dashboard/reports": "Reports",
+  "/dashboard/cards": "Cards",
+  "/dashboard/transactions": "Transactions",
   "/dashboard/budgets": "Budgets",
   "/dashboard/savings": "Savings",
   "/dashboard/subscriptions": "Subscriptions",
+  "/dashboard/ai-assistant": "AI Assistant",
+  "/dashboard/profile": "Profile",
   "/dashboard/notifications": "Notifications",
   "/dashboard/settings": "Settings",
   "/dashboard/trips/new": "New Trip",
@@ -32,31 +38,79 @@ export function TopBar({ displayName, email, theme }: TopBarProps) {
 
   return (
     <header
-      className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-surface px-4"
-      style={{ gap: 12, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}
+      style={{
+        height: 56,
+        flexShrink: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "0 20px",
+        gap: 12,
+        background: "rgba(9, 9, 18, 0.85)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        borderBottom: "1px solid rgba(255,255,255,0.05)",
+        position: "sticky",
+        top: 0,
+        zIndex: 20,
+      }}
     >
       {/* Left: hamburger + page title */}
-      <div className="flex items-center gap-3 min-w-0">
+      <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
         <button
           onClick={() => window.dispatchEvent(new CustomEvent("sidebar:toggle"))}
           aria-label="Toggle sidebar"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border text-muted transition-colors hover:bg-border hover:text-foreground md:hidden"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 34,
+            height: 34,
+            borderRadius: 8,
+            border: "1px solid rgba(255,255,255,0.06)",
+            background: "transparent",
+            color: "rgba(255,255,255,0.5)",
+            cursor: "pointer",
+            flexShrink: 0,
+          }}
+          className="md:hidden topbar-btn"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <line x1="3" y1="6" x2="21" y2="6" />
             <line x1="3" y1="12" x2="21" y2="12" />
             <line x1="3" y1="18" x2="21" y2="18" />
           </svg>
         </button>
-        <h1 className="truncate text-sm font-semibold tracking-tight">{title}</h1>
+        <h1
+          style={{
+            fontFamily: "'Clash Display', sans-serif",
+            fontSize: "1rem",
+            fontWeight: 700,
+            color: "#ffffff",
+            letterSpacing: "-0.02em",
+            margin: 0,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {title}
+        </h1>
       </div>
 
       {/* Right: actions */}
-      <div className="flex shrink-0 items-center gap-1.5">
+      <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
         <ThemeToggle initialTheme={theme} />
         <NotificationBell />
         <ProfileMenu displayName={displayName} email={email} />
       </div>
+
+      <style>{`
+        .topbar-btn:hover {
+          background: rgba(255,255,255,0.06) !important;
+          color: #ffffff !important;
+        }
+      `}</style>
     </header>
   );
 }

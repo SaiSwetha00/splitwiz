@@ -292,93 +292,90 @@ export default function BudgetsPage() {
             const spent = spentById.get(b.id) ?? 0;
             const pct = b.amount_cents > 0 ? Math.min(100, (spent / b.amount_cents) * 100) : 0;
             const over = spent > b.amount_cents;
-            const barColor = over
-              ? "bg-negative"
-              : pct >= 80
-                ? "bg-amber-500"
-                : "bg-accent";
+            const barBg = over ? "#FE1514" : pct >= 80 ? "#6366f1" : "#06b6d4";
             return (
               <div
                 key={b.id}
-                className="flex flex-col gap-3 rounded-2xl border border-border bg-surface px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+                style={{
+                  display: "flex", flexDirection: "column", gap: 12,
+                  borderRadius: 16, border: "1px solid rgba(255,255,255,0.06)",
+                  background: "#0f0f1a", padding: "16px 20px",
+                  transition: "border-color 0.2s, transform 0.2s",
+                }}
+                className="budget-card sm:flex-row sm:items-center sm:justify-between"
               >
-                <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                  <div className="flex items-center gap-2">
-                    {b.category?.icon && <span className="text-lg">{b.category.icon}</span>}
-                    <span className="font-medium">{b.name}</span>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted">
-                    <span className={`font-semibold ${over ? "text-negative" : "text-foreground"}`}>
-                      $
-                      {fromCents(spent).toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    </span>
-                    <span>
-                      of $
-                      {fromCents(b.amount_cents).toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    </span>
-                    <span>·</span>
-                    <span>{b.period}</span>
-                    {b.category && (
-                      <>
-                        <span>·</span>
-                        <span>{b.category.name}</span>
-                      </>
+                <div style={{ display: "flex", minWidth: 0, flex: 1, flexDirection: "column", gap: 8 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    {b.category?.icon ? (
+                      <div style={{
+                        width: 34, height: 34, borderRadius: 9,
+                        background: `linear-gradient(135deg, ${b.category.color ?? "#3730a3"} 0%, ${b.category.color ? b.category.color + "cc" : "#6366f1"} 100%)`,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 16, flexShrink: 0,
+                      }}>
+                        {b.category.icon}
+                      </div>
+                    ) : (
+                      <div style={{
+                        width: 34, height: 34, borderRadius: 9,
+                        background: "linear-gradient(135deg, #3730a3, #6366f1)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        color: "#fff", flexShrink: 0,
+                      }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M20 12V6a2 2 0 00-2-2H4a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2v-3" />
+                          <path d="M16 12h6" /><circle cx="19" cy="12" r="1" fill="currentColor" />
+                        </svg>
+                      </div>
                     )}
-                    <span>·</span>
-                    <span>
-                      From{" "}
-                      {new Date(b.start_date).toLocaleDateString(undefined, {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                      {b.end_date &&
-                        ` — ${new Date(b.end_date).toLocaleDateString(undefined, {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}`}
+                    <span style={{ fontWeight: 600, fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "#fff" }}>
+                      {b.name}
+                    </span>
+                    <span style={{
+                      fontSize: 11, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+                      color: "#94a3b8", background: "rgba(255,255,255,0.06)",
+                      border: "1px solid rgba(255,255,255,0.06)", borderRadius: 6,
+                      padding: "2px 8px", marginLeft: 2,
+                    }}>
+                      {b.period}
                     </span>
                   </div>
-                  <div
-                    className="h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-background"
-                    role="progressbar"
-                    aria-valuenow={Math.round(pct)}
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                    aria-label={`${b.name} budget usage`}
-                  >
-                    <div
-                      className={`h-full rounded-full transition-all ${barColor}`}
-                      style={{ width: `${pct}%` }}
-                    />
+                  <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "4px 8px", fontSize: 12, color: "#94a3b8", fontFamily: "'DM Sans', sans-serif" }}>
+                    <span style={{ fontWeight: 700, color: over ? "#FE1514" : "#ffffff" }}>
+                      ${fromCents(spent).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                    <span>of ${fromCents(b.amount_cents).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    {b.category && <><span>·</span><span>{b.category.name}</span></>}
+                    <span>·</span>
+                    <span>
+                      From {new Date(b.start_date).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                      {b.end_date && ` — ${new Date(b.end_date).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`}
+                    </span>
+                  </div>
+                  <div style={{ height: 6, maxWidth: 320, width: "100%", borderRadius: 999, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}
+                    role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100} aria-label={`${b.name} budget usage`}>
+                    <div style={{ height: "100%", borderRadius: 999, width: `${pct}%`, background: barBg, transition: "width 0.6s ease" }} />
                   </div>
                   {over && (
-                    <p className="text-xs font-medium text-negative">
-                      Over budget by $
-                      {fromCents(spent - b.amount_cents).toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
+                    <p style={{ fontSize: 12, fontWeight: 600, color: "#FE1514", fontFamily: "'DM Sans', sans-serif" }}>
+                      Over budget by ${fromCents(spent - b.amount_cents).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                   )}
                 </div>
-                <div className="flex shrink-0 gap-1">
+                <div style={{ display: "flex", flexShrink: 0, gap: 6 }}>
                   <button
                     onClick={() => openEdit(b)}
-                    className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted hover:text-foreground"
+                    style={{ borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)", padding: "5px 12px", fontSize: 12, fontWeight: 600, background: "transparent", color: "#94a3b8", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "color 0.15s, border-color 0.15s" }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#fff"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.15)"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#94a3b8"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.08)"; }}
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(b.id)}
-                    className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-negative hover:border-negative/30"
+                    style={{ borderRadius: 8, border: "1px solid rgba(254,21,20,0.2)", padding: "5px 12px", fontSize: 12, fontWeight: 600, background: "transparent", color: "#FE1514", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "background 0.15s, border-color 0.15s" }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(254,21,20,0.08)"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(254,21,20,0.35)"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(254,21,20,0.2)"; }}
                   >
                     Delete
                   </button>
