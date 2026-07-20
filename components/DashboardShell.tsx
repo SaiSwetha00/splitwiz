@@ -6,6 +6,7 @@ import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistratio
 import { InstallBanner } from "@/components/InstallBanner";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { PushPermissionBanner } from "@/components/PushPermissionBanner";
+import { PageDecorator } from "@/components/PageDecorator";
 
 interface DashboardShellProps {
   displayName: string;
@@ -20,6 +21,7 @@ export function DashboardShell({ displayName, email, theme, children }: Dashboar
   return (
     <>
       <ThemeApplier theme={theme} />
+      <PageDecorator />
       <ServiceWorkerRegistration />
       <OfflineBanner />
       <div className="flex flex-1 overflow-hidden" style={{ minHeight: 0 }}>
