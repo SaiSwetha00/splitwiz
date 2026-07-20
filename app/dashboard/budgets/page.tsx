@@ -298,9 +298,12 @@ export default function BudgetsPage() {
                 key={b.id}
                 style={{
                   display: "flex", flexDirection: "column", gap: 12,
-                  borderRadius: 16, border: "1px solid rgba(255,255,255,0.06)",
-                  background: "#0f0f1a", padding: "16px 20px",
-                  transition: "border-color 0.2s, transform 0.2s",
+                  borderRadius: 16, border: "1px solid rgba(255,255,255,0.09)",
+                  background: "rgba(10,10,22,0.75)", padding: "16px 20px",
+                  backdropFilter: "blur(20px) saturate(160%)",
+                  WebkitBackdropFilter: "blur(20px) saturate(160%)",
+                  boxShadow: "0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)",
+                  transition: "border-color 0.2s, transform 0.2s, box-shadow 0.2s",
                 }}
                 className="budget-card sm:flex-row sm:items-center sm:justify-between"
               >

@@ -197,8 +197,11 @@ export default function SubscriptionsPage() {
       {activeSubs.length > 0 && (
         <div style={{ marginBottom: 24, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div style={{
-            borderRadius: 16, background: "#0f0f1a",
+            borderRadius: 16, background: "rgba(10,10,22,0.75)",
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             border: "1px solid rgba(6,182,212,0.2)",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)",
             padding: 16, borderLeft: "3px solid #06b6d4",
           }}>
             <p style={{ fontSize: 12, color: "#94a3b8", fontFamily: "'DM Sans', sans-serif", margin: "0 0 6px" }}>Monthly estimate</p>
@@ -207,8 +210,11 @@ export default function SubscriptionsPage() {
             </p>
           </div>
           <div style={{
-            borderRadius: 16, background: "#0f0f1a",
+            borderRadius: 16, background: "rgba(10,10,22,0.75)",
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             border: "1px solid rgba(99,102,241,0.2)",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)",
             padding: 16, borderLeft: "3px solid #6366f1",
           }}>
             <p style={{ fontSize: 12, color: "#94a3b8", fontFamily: "'DM Sans', sans-serif", margin: "0 0 6px" }}>Annual estimate</p>
@@ -355,10 +361,13 @@ export default function SubscriptionsPage() {
               key={s.id}
               style={{
                 display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16,
-                borderRadius: 16, border: s.active ? "1px solid rgba(69,216,129,0.12)" : "1px solid rgba(255,255,255,0.06)",
-                background: "#0f0f1a", padding: "14px 20px",
+                borderRadius: 16, border: s.active ? "1px solid rgba(69,216,129,0.18)" : "1px solid rgba(255,255,255,0.08)",
+                background: "rgba(10,10,22,0.75)", padding: "14px 20px",
+                backdropFilter: "blur(20px) saturate(160%)",
+                WebkitBackdropFilter: "blur(20px) saturate(160%)",
+                boxShadow: "0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)",
                 opacity: s.active ? 1 : 0.55,
-                transition: "border-color 0.2s",
+                transition: "border-color 0.2s, box-shadow 0.2s",
               }}
             >
               <div style={{ display: "flex", minWidth: 0, flex: 1, flexDirection: "column", gap: 5 }}>

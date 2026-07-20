@@ -313,8 +313,11 @@ export function TransactionsPageClient({ transactions, summary, trips = [] }: Pr
                 key={t.id}
                 className="rounded-2xl transition"
                 style={{
-                  border: "1px solid rgba(255,255,255,0.06)",
-                  background: "#0f0f1a",
+                  border: "1px solid rgba(255,255,255,0.09)",
+                  background: "rgba(10,10,22,0.75)",
+                  backdropFilter: "blur(20px) saturate(160%)",
+                  WebkitBackdropFilter: "blur(20px) saturate(160%)",
+                  boxShadow: "0 4px 24px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.04)",
                 }}
               >
                 {/* Main row — click to toggle expand */}

@@ -281,9 +281,12 @@ export default function SavingsPage() {
               <div
                 key={g.id}
                 style={{
-                  borderRadius: 16, border: "1px solid rgba(255,255,255,0.06)",
-                  background: "#0f0f1a", padding: 20,
-                  transition: "border-color 0.2s, transform 0.2s",
+                  borderRadius: 16, border: "1px solid rgba(255,255,255,0.09)",
+                  background: "rgba(10,10,22,0.75)", padding: 20,
+                  backdropFilter: "blur(20px) saturate(160%)",
+                  WebkitBackdropFilter: "blur(20px) saturate(160%)",
+                  boxShadow: "0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)",
+                  transition: "border-color 0.2s, transform 0.2s, box-shadow 0.2s",
                 }}
               >
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>

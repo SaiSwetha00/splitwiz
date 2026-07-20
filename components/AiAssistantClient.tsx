@@ -321,14 +321,16 @@ export function AiAssistantClient({ displayName, initialContext }: Props) {
                 background:
                   msg.role === "user"
                     ? "linear-gradient(135deg, #6366f1 0%, #818cf8 100%)"
-                    : "rgba(15,15,26,0.9)",
+                    : "rgba(14,14,26,0.82)",
+                backdropFilter: msg.role === "assistant" ? "blur(16px) saturate(150%)" : undefined,
+                WebkitBackdropFilter: msg.role === "assistant" ? "blur(16px) saturate(150%)" : undefined,
                 color: "#fff",
                 border:
-                  msg.role === "assistant" ? "1px solid rgba(255,255,255,0.06)" : "none",
+                  msg.role === "assistant" ? "1px solid rgba(255,255,255,0.09)" : "none",
                 boxShadow:
                   msg.role === "user"
-                    ? "0 4px 14px rgba(99,102,241,0.35)"
-                    : "none",
+                    ? "0 4px 14px rgba(99,102,241,0.4)"
+                    : "0 2px 12px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.04)",
                 fontSize: 14,
                 lineHeight: 1.5,
                 whiteSpace: "pre-wrap",
@@ -415,11 +417,13 @@ export function AiAssistantClient({ displayName, initialContext }: Props) {
           style={{
             flex: 1,
             resize: "none",
-            border: "1px solid rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.1)",
             borderRadius: 12,
             padding: "10px 14px",
             fontSize: 14,
-            background: "rgba(15,15,26,0.8)",
+            background: "rgba(12,12,22,0.85)",
+            backdropFilter: "blur(16px) saturate(150%)",
+            WebkitBackdropFilter: "blur(16px) saturate(150%)",
             color: "#ffffff",
             fontFamily: "inherit",
             lineHeight: 1.5,
