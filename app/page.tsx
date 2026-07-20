@@ -45,10 +45,10 @@ const css = `
   .nav-links a { color: rgba(255,255,255,0.75); transition: color .2s; }
   .nav-links a:hover { color: #fff; }
   .nav-actions { display: flex; align-items: center; gap: 12px; }
-  .nav-signin { font-weight: 600; font-size: 15px; color: rgba(255,255,255,0.75); padding: 10px 6px; transition: color .2s; }
-  .nav-signin:hover { color: #fff; }
-  .btn-primary { font-family: 'Clash Display', sans-serif; font-weight: 500; font-size: 15px; color: #fff; background: #6366f1; padding: 11px 22px; border-radius: 100px; box-shadow: 0 8px 20px rgba(99,102,241,0.35); transition: background .2s, transform .15s, box-shadow .2s; white-space: nowrap; }
-  .btn-primary:hover { background: #4f46e5; color: #fff; transform: translateY(-1px); box-shadow: 0 12px 28px rgba(99,102,241,0.45); }
+  .nav-signin { font-weight: 600; font-size: 15px; color: rgba(255,255,255,0.75) !important; padding: 10px 6px; transition: color .2s; }
+  .nav-signin:hover { color: #fff !important; }
+  .btn-primary { font-family: 'Clash Display', sans-serif; font-weight: 500; font-size: 15px; color: #fff !important; background: #6366f1; padding: 11px 22px; border-radius: 100px; box-shadow: 0 8px 20px rgba(99,102,241,0.35); transition: background .2s, transform .15s, box-shadow .2s; white-space: nowrap; }
+  .btn-primary:hover { background: #4f46e5; color: #fff !important; transform: translateY(-1px); box-shadow: 0 12px 28px rgba(99,102,241,0.45); }
   .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; }
   .hamburger span { display: block; width: 22px; height: 2px; border-radius: 2px; background: rgba(255,255,255,0.8); transition: all .3s; }
   .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
@@ -60,13 +60,13 @@ const css = `
   .mobile-menu a:hover { color: #fff; background: rgba(255,255,255,0.04); }
   .mobile-menu .btn-primary-mobile { margin: 16px clamp(20px,5vw,56px) 0; display: block; text-align: center; background: #6366f1; color: #fff; border-radius: 100px; padding: 14px; font-family: 'Clash Display', sans-serif; font-weight: 500; font-size: 16px; }
 
-  .btn-hero-white { display: flex; align-items: center; gap: 10px; font-family: 'Clash Display', sans-serif; font-weight: 500; font-size: 16px; color: #0a0a0a; background: #fff; padding: 15px 28px; border-radius: 100px; box-shadow: 0 10px 26px rgba(0,0,0,0.35); transition: transform .15s, box-shadow .2s; }
-  .btn-hero-white:hover { color: #0a0a0a; transform: translateY(-2px); box-shadow: 0 14px 32px rgba(0,0,0,0.4); }
-  .btn-hero-ghost { display: flex; align-items: center; gap: 10px; font-family: 'Clash Display', sans-serif; font-weight: 500; font-size: 16px; color: #fff; background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.25); padding: 14.5px 28px; border-radius: 100px; transition: background .2s, border-color .2s, transform .15s; }
-  .btn-hero-ghost:hover { color: #fff; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); transform: translateY(-2px); }
+  .btn-hero-white { display: flex; align-items: center; gap: 10px; font-family: 'Clash Display', sans-serif; font-weight: 500; font-size: 16px; color: #0a0a0a !important; background: #fff; padding: 15px 28px; border-radius: 100px; box-shadow: 0 10px 26px rgba(0,0,0,0.35); transition: transform .15s, box-shadow .2s; }
+  .btn-hero-white:hover { color: #0a0a0a !important; transform: translateY(-2px); box-shadow: 0 14px 32px rgba(0,0,0,0.4); }
+  .btn-hero-ghost { display: flex; align-items: center; gap: 10px; font-family: 'Clash Display', sans-serif; font-weight: 500; font-size: 16px; color: #fff !important; background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.25); padding: 14.5px 28px; border-radius: 100px; transition: background .2s, border-color .2s, transform .15s; }
+  .btn-hero-ghost:hover { color: #fff !important; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); transform: translateY(-2px); }
 
-  .btn-pricing { position: relative; display: block; background: linear-gradient(135deg, #818cf8, #4f46e5); color: #fff; font-family: 'Clash Display', sans-serif; font-weight: 500; font-size: 16px; padding: 16px; border-radius: 100px; box-shadow: 0 0 0 1px rgba(139,146,255,0.4), 0 12px 32px rgba(99,102,241,0.5); overflow: hidden; text-align: center; transition: transform .15s, box-shadow .2s; }
-  .btn-pricing:hover { color: #fff; transform: translateY(-2px); box-shadow: 0 0 0 1px rgba(139,146,255,0.5), 0 16px 40px rgba(99,102,241,0.65); }
+  .btn-pricing { position: relative; display: block; background: linear-gradient(135deg, #818cf8, #4f46e5); color: #fff !important; font-family: 'Clash Display', sans-serif; font-weight: 500; font-size: 16px; padding: 16px; border-radius: 100px; box-shadow: 0 0 0 1px rgba(139,146,255,0.4), 0 12px 32px rgba(99,102,241,0.5); overflow: hidden; text-align: center; transition: transform .15s, box-shadow .2s; }
+  .btn-pricing:hover { color: #fff !important; transform: translateY(-2px); box-shadow: 0 0 0 1px rgba(139,146,255,0.5), 0 16px 40px rgba(99,102,241,0.65); }
   .btn-pricing::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(100deg, transparent, rgba(255,255,255,0.3), transparent); transform: skewX(-20deg); animation: shimmer 3s ease-in-out infinite; }
 
   .faq-item { background: #fff; border-radius: 16px; margin-bottom: 14px; border: 1px solid rgba(122,138,158,0.15); border-left: 1px solid rgba(122,138,158,0.15); overflow: hidden; box-shadow: 0 6px 20px rgba(20,30,60,0.05); transition: border-left .25s, box-shadow .25s; }
